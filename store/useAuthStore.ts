@@ -1,147 +1,138 @@
 'use client';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import type { AuthUser, AuthRole } from '@/types';
+import { authService } from '@/lib/services/auth';
 
-// ─── Mock Users ───────────────────────────────────────────────────────────────
-export const MOCK_USERS: AuthUser[] = [
-  {
-    id: 'auth_1',
-    nombre: 'Luis Pérez',
-    email: 'admin@arquitectura.com',
-    password: 'admin123',
-    authRole: 'SuperAdmin',
-    avatar: 'LP',
-    empresaId: undefined,
-  },
-  {
-    id: 'auth_2',
-    nombre: 'Ana García',
-    email: 'gerente@arquitectura.com',
-    password: 'gerente123',
-    authRole: 'Gerente',
-    empresaId: 'e1',
-    empresaNombre: 'Constructora ABC',
-    avatar: 'AG',
-  },
-  {
-    id: 'auth_3',
-    nombre: 'Carlos Martínez',
-    email: 'arquitecto@arquitectura.com',
-    password: 'arq123',
-    authRole: 'Arquitecto',
-    empresaId: 'e1',
-    empresaNombre: 'Constructora ABC',
-    avatar: 'CM',
-    proyectosAsignados: ['p1', 'p3'],
-  },
-  {
-    id: 'auth_4',
-    nombre: 'María López',
-    email: 'capturista@arquitectura.com',
-    password: 'capt123',
-    authRole: 'Capturista',
-    empresaId: 'e2',
-    empresaNombre: 'Materiales XYZ',
-    avatar: 'ML',
-  },
-  {
-    id: 'auth_5',
-    nombre: 'Roberto Sánchez',
-    email: 'supervisor@arquitectura.com',
-    password: 'sup123',
-    authRole: 'Supervisor',
-    empresaId: 'e1',
-    empresaNombre: 'Constructora ABC',
-    avatar: 'RS',
-    proyectosAsignados: ['p4'],
-  },
-];
-
-// Role → default route
+// Ruta de destino por defecto para cada rol al iniciar sesión
 export const ROLE_REDIRECTS: Record<AuthRole, string> = {
-  SuperAdmin: '/super-admin/dashboard',
-  Gerente: '/dashboard',
-  Arquitecto: '/dashboard-ejecutivo',
-  Capturista: '/gastos/nuevo',
-  Supervisor: '/seguimiento-obra',
+  administrador: '/dashboard',
+  gerente:       '/dashboard',
+  supervisor:    '/asistencia',
+  ingeniero:     '/asistencia',
 };
-
-// ─── Simulated JWT ────────────────────────────────────────────────────────────
-function createToken(user: AuthUser): string {
-  const payload = {
-    id: user.id,
-    email: user.email,
-    authRole: user.authRole,
-    empresaId: user.empresaId,
-    exp: Date.now() + 24 * 60 * 60 * 1000, // 24h
-  };
-  return btoa(JSON.stringify(payload));
-}
-
-function parseToken(token: string): { id: string; email: string; authRole: AuthRole; exp: number } | null {
-  try {
-    const data = JSON.parse(atob(token));
-    if (data.exp < Date.now()) return null;
-    return data;
-  } catch {
-    return null;
-  }
-}
 
 // ─── Store Interface ──────────────────────────────────────────────────────────
 interface AuthState {
   currentUser: AuthUser | null;
   token: string | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
 
-  login: (email: string, password: string) => { success: boolean; error?: string; redirectTo?: string };
-  logout: () => void;
-  initAuth: () => void;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; redirectTo?: string }>;
+  logout: () => Promise<void>;
+  initAuth: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   currentUser: null,
   token: null,
   isAuthenticated: false,
+  isLoading: true,
 
-  login: (email, password) => {
-    const user = MOCK_USERS.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-    );
-    if (!user) {
-      return { success: false, error: 'Credenciales incorrectas. Verifica tu email y contraseña.' };
+  login: async (email, password) => {
+    try {
+      const response = await authService.login(email, password);
+      
+      if (response.status === 'success' && response.data) {
+        const { token, usuario } = response.data;
+        
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('auth_token', token);
+          const maxAge = 60 * 60 * 24;
+          // Cookie de token para autenticación
+          document.cookie = `auth_token=${token}; path=/; max-age=${maxAge}; SameSite=Lax`;
+          // Cookie auxiliar de rol para el middleware (no sensible)
+          document.cookie = `auth_role=${usuario.rol.nombre}; path=/; max-age=${maxAge}; SameSite=Lax`;
+        }
+        
+        set({ currentUser: usuario, token, isAuthenticated: true });
+        
+        // Determinar redirección basada en el rol de la API
+        const role = usuario.rol.nombre;
+        return { success: true, redirectTo: ROLE_REDIRECTS[role] || '/no-autorizado' };
+      }
+      
+      return { success: false, error: response.message || 'Credenciales incorrectas' };
+    } catch (error: any) {
+      return { 
+        success: false, 
+        error: error.message || error.data?.message || 'Error de conexión con el servidor' 
+      };
     }
-    const token = createToken(user);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('auth_token', token);
-      // Set cookie for middleware
-      document.cookie = `auth_token=${token}; path=/; max-age=${60 * 60 * 24}`;
-    }
-    set({ currentUser: user, token, isAuthenticated: true });
-    return { success: true, redirectTo: ROLE_REDIRECTS[user.authRole] };
   },
 
-  logout: () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token');
-      document.cookie = 'auth_token=; path=/; max-age=0';
+  logout: async () => {
+    try {
+      let token = null;
+      if (typeof window !== 'undefined') {
+        token = localStorage.getItem('auth_token');
+      }
+      if (token) {
+        await authService.logout();
+      }
+    } catch (e) {
+      console.error('Error durante el logout API', e);
+    } finally {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auth_token');
+        document.cookie = 'auth_token=; path=/; max-age=0';
+        document.cookie = 'auth_role=; path=/; max-age=0';
+      }
+      set({ currentUser: null, token: null, isAuthenticated: false });
     }
-    set({ currentUser: null, token: null, isAuthenticated: false });
   },
 
-  initAuth: () => {
+  initAuth: async () => {
     if (typeof window === 'undefined') return;
-    const token = localStorage.getItem('auth_token');
-    if (!token) return;
-    const parsed = parseToken(token);
-    if (!parsed) {
-      localStorage.removeItem('auth_token');
+    
+    let token = null;
+    if (typeof window !== 'undefined') {
+      const match = document.cookie?.match(new RegExp('(^| )auth_token=([^;]+)'));
+      if (match) {
+        token = match[2];
+      }
+      
+      if (!token) {
+        token = localStorage.getItem('auth_token');
+      }
+    }
+
+    if (!token) {
+      set({ isLoading: false });
       return;
     }
-    const user = MOCK_USERS.find((u) => u.id === parsed.id);
-    if (user) {
-      set({ currentUser: user, token, isAuthenticated: true });
+    
+    try {
+      const response = await authService.getUsuario();
+      if (response.status === 'success' && response.data) {
+        // Soporta tanto response.data directo (API real) como response.data.usuario
+        const rawData = response.data as any;
+        const usuario: AuthUser = rawData.usuario ? rawData.usuario : rawData;
+        
+        if (!usuario || !usuario.rol) {
+          throw new Error('Estructura de usuario no válida');
+        }
+
+        // Restaurar la cookie de rol si por alguna razón se perdió (ej. borrado manual)
+        document.cookie = `auth_role=${usuario.rol.nombre}; path=/; max-age=${60 * 60 * 24}; SameSite=Lax`;
+        set({ 
+          currentUser: usuario, 
+          token, 
+          isAuthenticated: true,
+          isLoading: false
+        });
+      } else {
+        throw new Error('Token inválido o expirado');
+      }
+    } catch (error) {
+      console.error('Error inicializando auth', error);
+      // Limpiar solo en el navegador (evita errores de SSR)
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auth_token');
+        document.cookie = 'auth_token=; path=/; max-age=0';
+        document.cookie = 'auth_role=; path=/; max-age=0';
+      }
+      set({ currentUser: null, token: null, isAuthenticated: false, isLoading: false });
     }
   },
 }));

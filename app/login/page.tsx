@@ -1,13 +1,13 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/useAuthStore';
+import { useAuthStore, ROLE_REDIRECTS } from '@/store/useAuthStore';
 import { Building2, Mail, Lock, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isAuthenticated, initAuth } = useAuthStore();
+  const { login, isAuthenticated, initAuth, currentUser, isLoading } = useAuthStore();
   const toast = useToast();
 
   const [email, setEmail] = useState('');
@@ -21,35 +21,25 @@ export default function LoginPage() {
   }, [initAuth]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      const token = localStorage.getItem('auth_token');
-      if (token) {
-        try {
-          const payload = JSON.parse(atob(token));
-          const redirects: Record<string, string> = {
-            SuperAdmin: '/super-admin/dashboard',
-            Gerente: '/dashboard',
-            Arquitecto: '/dashboard-ejecutivo',
-            Capturista: '/gastos/nuevo',
-            Supervisor: '/seguimiento-obra',
-          };
-          router.replace(redirects[payload.authRole] || '/dashboard');
-        } catch { router.replace('/dashboard'); }
-      }
+    if (isAuthenticated && currentUser && !isLoading) {
+      const redirectUrl = ROLE_REDIRECTS[currentUser.rol.nombre] || '/dashboard';
+      router.replace(redirectUrl);
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, currentUser, router, isLoading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    
     if (!email.trim() || !password.trim()) {
       setError('Por favor ingresa tu correo y contraseña.');
       return;
     }
+    
     setLoading(true);
-    await new Promise(r => setTimeout(r, 800)); // Simulate network
-    const result = login(email.trim(), password);
+    const result = await login(email.trim(), password);
     setLoading(false);
+    
     if (!result.success) {
       setError(result.error || 'Credenciales incorrectas');
       toast.error('Error de autenticación', result.error || 'Verifica tus datos');
@@ -59,18 +49,14 @@ export default function LoginPage() {
     }
   };
 
-  const quickLogin = (em: string, pw: string) => {
-    setEmail(em);
-    setPassword(pw);
-  };
-
-  const demoUsers = [
-    { label: 'Super Admin', email: 'admin@arquitectura.com', password: 'admin123', color: 'bg-purple-500' },
-    { label: 'Gerente', email: 'gerente@arquitectura.com', password: 'gerente123', color: 'bg-blue-600' },
-    { label: 'Arquitecto', email: 'arquitecto@arquitectura.com', password: 'arq123', color: 'bg-sky-500' },
-    { label: 'Capturista', email: 'capturista@arquitectura.com', password: 'capt123', color: 'bg-emerald-500' },
-    { label: 'Supervisor', email: 'supervisor@arquitectura.com', password: 'sup123', color: 'bg-amber-500' },
-  ];
+  // If we are checking auth state, we can show a full screen loader or just wait
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <Loader2 size={48} className="animate-spin text-blue-500" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-slate-900">
@@ -96,7 +82,7 @@ export default function LoginPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-sky-500 shadow-lg shadow-blue-500/30 mb-4">
             <Building2 size={32} className="text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white">ArquiWeb</h1>
+          <h1 className="text-3xl font-bold text-white">SIGO</h1>
           <p className="text-blue-300 mt-1 text-sm">Sistema de Gestión de Obra</p>
         </div>
 
@@ -118,7 +104,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  placeholder="usuario@empresa.com"
+                  placeholder="usuario@sigo.com"
                   autoComplete="email"
                   className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                 />
@@ -170,31 +156,11 @@ export default function LoginPage() {
               {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </button>
           </form>
-
-          {/* Demo users */}
-          <div className="mt-6 pt-6 border-t border-white/10">
-            <p className="text-xs text-slate-500 text-center mb-3">Acceso rápido de demostración</p>
-            <div className="grid grid-cols-5 gap-1.5">
-              {demoUsers.map(u => (
-                <button
-                  key={u.label}
-                  onClick={() => quickLogin(u.email, u.password)}
-                  title={`${u.label}\n${u.email}`}
-                  className={`${u.color} text-white text-[10px] font-semibold px-1 py-2 rounded-lg hover:opacity-90 transition-all hover:-translate-y-0.5 leading-tight text-center`}
-                >
-                  {u.label}
-                </button>
-              ))}
-            </div>
-            <p className="text-[10px] text-slate-600 text-center mt-2">
-              Haz clic para auto-rellenar las credenciales
-            </p>
-          </div>
         </div>
 
         {/* Footer */}
         <p className="text-center text-slate-600 text-xs mt-6">
-          © 2025 ArquiWeb · Sistema de Gestión Integral de Obra
+          © 2026 SIGO · Sistema de Gestión Integral de Obra
         </p>
       </div>
     </div>

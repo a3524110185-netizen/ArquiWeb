@@ -67,13 +67,21 @@ export default function Header() {
   };
 
   const roleColors: Record<string, string> = {
-    SuperAdmin: 'from-purple-600 to-purple-500',
-    Gerente: 'from-blue-700 to-blue-600',
-    Arquitecto: 'from-sky-600 to-sky-500',
-    Supervisor: 'from-amber-600 to-amber-500',
-    Capturista: 'from-emerald-600 to-emerald-500',
+    administrador: 'from-purple-600 to-purple-500',
+    gerente: 'from-blue-700 to-blue-600',
+    supervisor: 'from-amber-600 to-amber-500',
+    ingeniero: 'from-emerald-600 to-emerald-500',
   };
-  const avatarGradient = roleColors[currentUser?.authRole || 'Gerente'] || 'from-blue-700 to-blue-600';
+  const avatarGradient = roleColors[currentUser?.rol?.nombre || 'gerente'] || 'from-blue-700 to-blue-600';
+
+  const getInitials = (name: string) => {
+    if (!name) return 'U';
+    const parts = name.split(' ');
+    if (parts.length > 1) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
 
   return (
     <header className={cn(
@@ -154,11 +162,15 @@ export default function Header() {
         {/* User avatar + logout */}
         <div className="flex items-center gap-2 pl-2 border-l border-default">
           <div className={cn('w-8 h-8 rounded-full bg-gradient-to-br flex items-center justify-center text-xs font-bold text-white', avatarGradient)}>
-            {currentUser?.avatar || 'U'}
+            {currentUser?.foto_perfil ? (
+              <img src={currentUser.foto_perfil} alt="avatar" className="w-full h-full rounded-full object-cover" />
+            ) : (
+              getInitials(currentUser?.nombre || '')
+            )}
           </div>
           <div className="hidden sm:block">
             <p className="text-xs font-semibold text-primary leading-none">{currentUser?.nombre || 'Usuario'}</p>
-            <p className="text-[10px] text-muted mt-0.5">{currentUser?.authRole}</p>
+            <p className="text-[10px] text-muted mt-0.5 capitalize">{currentUser?.rol?.nombre}</p>
           </div>
           <button
             onClick={handleLogout}

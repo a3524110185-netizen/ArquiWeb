@@ -1,16 +1,17 @@
 // ─── Auth ────────────────────────────────────────────────────────────────────
-export type AuthRole = 'SuperAdmin' | 'Gerente' | 'Arquitecto' | 'Capturista' | 'Supervisor';
+export type AuthRole = 'administrador' | 'gerente' | 'supervisor' | 'ingeniero';
 
 export interface AuthUser {
-  id: string;
+  id: number;
   nombre: string;
   email: string;
-  password: string;
-  authRole: AuthRole;
-  empresaId?: string;
-  empresaNombre?: string;
-  avatar: string;
-  proyectosAsignados?: string[];
+  telefono: string;
+  foto_perfil: string | null;
+  rol: {
+    id: number;
+    nombre: AuthRole;
+  };
+  proyectos?: any[];
 }
 
 // ─── Existing Roles ───────────────────────────────────────────────────────────

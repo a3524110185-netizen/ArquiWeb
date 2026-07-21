@@ -9,9 +9,11 @@ import {
   DollarSign, Clock, FileBarChart, TrendingUp, AlertOctagon,
   Activity, FolderOpen, FileText, CheckSquare, Image,
   AlertTriangle, Calendar, Settings, ChevronLeft, ChevronRight,
-  Building2, ClipboardList, ShieldAlert, Crown, Globe, FileCheck,
+  Building2, ClipboardList, ShieldAlert, FileCheck,
   ShoppingCart, BarChart3, Boxes, LogOut, ShieldCheck,
+  UserCircle, Timer,
 } from 'lucide-react';
+import type { AuthRole } from '@/types';
 
 interface NavItem {
   label: string;
@@ -25,35 +27,21 @@ interface NavGroup {
   items: NavItem[];
 }
 
-// Nav definitions by role
-const superAdminNav: NavGroup[] = [
-  {
-    title: 'Super Admin',
-    items: [
-      { label: 'Dashboard Global', href: '/super-admin/dashboard', icon: Crown },
-      { label: 'Empresas', href: '/super-admin/empresas', icon: Building2 },
-      { label: 'Usuarios Global', href: '/super-admin/usuarios', icon: Users },
-      { label: 'Proyectos Global', href: '/super-admin/proyectos', icon: FolderOpen },
-      { label: 'Licencias', href: '/super-admin/licencias', icon: FileCheck },
-      { label: 'Auditoría', href: '/super-admin/auditoria', icon: ShieldCheck },
-    ],
-  },
-];
-
-const gerenteNav: NavGroup[] = [
+// ─── Nav para administrador ───────────────────────────────────────────────────
+const administradorNav: NavGroup[] = [
   {
     title: 'Principal',
     items: [
       { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-      { label: 'Usuarios', href: '/usuarios', icon: Users },
-      { label: 'Seguimiento de Obra', href: '/seguimiento-obra', icon: HardHat },
+      { label: 'Proyectos', href: '/proyectos', icon: FolderOpen },
+      { label: 'Incidencias', href: '/incidencias', icon: AlertTriangle },
+      { label: 'Reportes Diarios', href: '/reportes-diarios', icon: FileText },
     ],
   },
   {
-    title: 'Catálogos',
+    title: 'Usuarios',
     items: [
-      { label: 'Materiales', href: '/catalogos/materiales', icon: Package },
-      { label: 'Proveedores', href: '/catalogos/proveedores', icon: Truck },
+      { label: 'Gestión de Usuarios', href: '/usuarios', icon: Users },
     ],
   },
   {
@@ -76,21 +64,20 @@ const gerenteNav: NavGroup[] = [
     ],
   },
   {
-    title: 'App Móvil',
+    title: 'Catálogos',
     items: [
-      { label: 'Dashboard Ejecutivo', href: '/dashboard-ejecutivo', icon: TrendingUp },
-      { label: 'Actividad Reciente', href: '/actividad-reciente', icon: Activity },
-      { label: 'Proyectos', href: '/proyectos/p1', icon: FolderOpen },
-      { label: 'Reportes Diarios', href: '/reportes-diarios', icon: FileText },
-      { label: 'Validar Reportes', href: '/validar-reportes', icon: CheckSquare },
-      { label: 'Galería Evidencias', href: '/galeria-evidencias', icon: Image },
+      { label: 'Materiales', href: '/catalogos/materiales', icon: Package },
+      { label: 'Proveedores', href: '/catalogos/proveedores', icon: Truck },
     ],
   },
   {
-    title: 'Incidencias',
+    title: 'Más',
     items: [
-      { label: 'Todas las Incidencias', href: '/incidencias', icon: AlertTriangle },
+      { label: 'Seguimiento de Obra', href: '/seguimiento-obra', icon: HardHat },
+      { label: 'Actividad Reciente', href: '/actividad-reciente', icon: Activity },
+      { label: 'Galería Evidencias', href: '/galeria-evidencias', icon: Image },
       { label: 'Incidencias Críticas', href: '/incidencias-criticas', icon: ShieldAlert },
+      { label: 'Validar Reportes', href: '/validar-reportes', icon: CheckSquare },
     ],
   },
   {
@@ -99,61 +86,95 @@ const gerenteNav: NavGroup[] = [
       { label: 'Categorías', href: '/configuracion/categorias', icon: Settings },
     ],
   },
-];
-
-const arquitectoNav: NavGroup[] = [
   {
-    title: 'Mis Proyectos',
+    title: 'Universal',
     items: [
-      { label: 'Dashboard Ejecutivo', href: '/dashboard-ejecutivo', icon: TrendingUp },
-      { label: 'Proyectos', href: '/proyectos/p1', icon: FolderOpen },
-      { label: 'Actividad Reciente', href: '/actividad-reciente', icon: Activity },
+      { label: 'Asistencia (Checador)', href: '/asistencia', icon: Timer },
     ],
   },
+];
+
+// ─── Nav para gerente ──────────────────────────────────────────────────────────
+const gerenteNav: NavGroup[] = [
   {
-    title: 'Reportes',
+    title: 'Principal',
     items: [
+      { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+      { label: 'Proyectos', href: '/proyectos', icon: FolderOpen },
+      { label: 'Incidencias', href: '/incidencias', icon: AlertTriangle },
       { label: 'Reportes Diarios', href: '/reportes-diarios', icon: FileText },
-      { label: 'Galería Evidencias', href: '/galeria-evidencias', icon: Image },
     ],
   },
   {
-    title: 'Incidencias',
+    title: 'Finanzas y RH',
     items: [
-      { label: 'Todas las Incidencias', href: '/incidencias', icon: AlertTriangle },
-      { label: 'Incidencias Críticas', href: '/incidencias-criticas', icon: ShieldAlert },
+      { label: 'Gastos de Obra', href: '/gastos-obra', icon: DollarSign },
+      { label: 'Horarios', href: '/horarios', icon: Clock },
+      { label: 'Reporte de Horas', href: '/reporte-horas', icon: FileBarChart },
+      { label: 'Control Horario', href: '/control-horario', icon: ClipboardList },
+      { label: 'Días No Laborales', href: '/dias-no-laborales', icon: Calendar },
     ],
   },
-];
-
-const supervisorNav: NavGroup[] = [
   {
-    title: 'Campo',
+    title: 'Comercial',
+    items: [
+      { label: 'Cotizaciones', href: '/comercial/cotizaciones', icon: FileText },
+      { label: 'Pedidos', href: '/comercial/pedidos', icon: ShoppingCart },
+      { label: 'Ventas', href: '/comercial/ventas', icon: BarChart3 },
+      { label: 'Inventario', href: '/comercial/inventario', icon: Boxes },
+    ],
+  },
+  {
+    title: 'Catálogos',
+    items: [
+      { label: 'Materiales', href: '/catalogos/materiales', icon: Package },
+      { label: 'Proveedores', href: '/catalogos/proveedores', icon: Truck },
+    ],
+  },
+  {
+    title: 'Más',
     items: [
       { label: 'Seguimiento de Obra', href: '/seguimiento-obra', icon: HardHat },
-      { label: 'Reportes Diarios', href: '/reportes-diarios', icon: FileText },
+      { label: 'Actividad Reciente', href: '/actividad-reciente', icon: Activity },
+      { label: 'Galería Evidencias', href: '/galeria-evidencias', icon: Image },
+      { label: 'Incidencias Críticas', href: '/incidencias-criticas', icon: ShieldAlert },
       { label: 'Validar Reportes', href: '/validar-reportes', icon: CheckSquare },
-      { label: 'Incidencias', href: '/incidencias', icon: AlertTriangle },
     ],
   },
   {
-    title: 'Herramientas',
+    title: 'Universal',
     items: [
-      { label: 'Control Horario', href: '/control-horario', icon: ClipboardList },
-      { label: 'Galería Evidencias', href: '/galeria-evidencias', icon: Image },
+      { label: 'Asistencia (Checador)', href: '/asistencia', icon: Timer },
     ],
   },
 ];
 
-function getNavForRole(role: string): NavGroup[] {
+// ─── Nav para supervisor e ingeniero (solo asistencia) ────────────────────────
+const campoNav: NavGroup[] = [
+  {
+    title: 'Mi Área',
+    items: [
+      { label: 'Asistencia (Checador)', href: '/asistencia', icon: Timer },
+    ],
+  },
+];
+
+function getNavForRole(role: AuthRole | undefined): NavGroup[] {
   switch (role) {
-    case 'SuperAdmin': return superAdminNav;
-    case 'Gerente': return gerenteNav;
-    case 'Arquitecto': return arquitectoNav;
-    case 'Supervisor': return supervisorNav;
-    default: return gerenteNav;
+    case 'administrador': return administradorNav;
+    case 'gerente':       return gerenteNav;
+    case 'supervisor':
+    case 'ingeniero':     return campoNav;
+    default:              return gerenteNav;
   }
 }
+
+const roleColors: Record<string, string> = {
+  administrador: 'bg-purple-500',
+  gerente:       'bg-blue-600',
+  supervisor:    'bg-amber-500',
+  ingeniero:     'bg-emerald-500',
+};
 
 export default function Sidebar() {
   const { sidebarCollapsed, toggleSidebar } = useStore();
@@ -161,27 +182,28 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const navGroups = getNavForRole(currentUser?.authRole || 'Gerente');
+  const navGroups = getNavForRole(currentUser?.rol?.nombre);
 
   const isActive = (href: string) => {
     if (href === '/dashboard') return pathname === '/dashboard';
-    if (href === '/super-admin/dashboard') return pathname === '/super-admin/dashboard';
     return pathname.startsWith(href);
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.replace('/login');
   };
 
-  const roleColors: Record<string, string> = {
-    SuperAdmin: 'bg-purple-500',
-    Gerente: 'bg-blue-600',
-    Arquitecto: 'bg-sky-500',
-    Supervisor: 'bg-amber-500',
-    Capturista: 'bg-emerald-500',
+  const roleBadgeColor = roleColors[currentUser?.rol?.nombre || ''] || 'bg-blue-600';
+
+  // Calcular iniciales del nombre
+  const getInitials = (name: string) => {
+    if (!name) return 'U';
+    const parts = name.split(' ');
+    return parts.length > 1
+      ? (parts[0][0] + parts[1][0]).toUpperCase()
+      : name.substring(0, 2).toUpperCase();
   };
-  const roleBadgeColor = roleColors[currentUser?.authRole || 'Gerente'] || 'bg-blue-600';
 
   return (
     <aside
@@ -197,22 +219,25 @@ export default function Sidebar() {
         </div>
         {!sidebarCollapsed && (
           <div className="overflow-hidden">
-            <p className="text-sm font-bold text-primary leading-none">ArquiWeb</p>
+            <p className="text-sm font-bold text-primary leading-none">SIGO</p>
             <p className="text-xs text-muted mt-0.5">Centro de Control</p>
           </div>
         )}
       </div>
 
-      {/* Role badge (not collapsed) */}
+      {/* User badge */}
       {!sidebarCollapsed && currentUser && (
         <div className="mx-3 mt-3 mb-1">
           <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-app border border-default">
             <div className={cn('w-7 h-7 rounded-lg text-white flex items-center justify-center text-xs font-bold shrink-0', roleBadgeColor)}>
-              {currentUser.avatar}
+              {currentUser.foto_perfil
+                ? <img src={currentUser.foto_perfil} alt="avatar" className="w-full h-full rounded-lg object-cover" />
+                : getInitials(currentUser.nombre)
+              }
             </div>
             <div className="min-w-0">
               <p className="text-xs font-semibold text-primary truncate">{currentUser.nombre}</p>
-              <p className="text-[10px] text-muted">{currentUser.authRole}</p>
+              <p className="text-[10px] text-muted capitalize">{currentUser.rol?.nombre}</p>
             </div>
           </div>
         </div>
