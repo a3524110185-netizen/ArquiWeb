@@ -92,9 +92,9 @@ export default function Header() {
 
       <div className="flex items-center gap-2">
         {/* Company badge */}
-        {currentUser?.empresaNombre && (
+        {(currentUser as any)?.empresaNombre && (
           <span className="hidden md:inline-flex items-center px-2.5 py-1 rounded-lg bg-app border border-default text-xs text-secondary font-medium">
-            {currentUser.empresaNombre}
+            {(currentUser as any).empresaNombre}
           </span>
         )}
 

@@ -11,10 +11,11 @@ import {
   AlertTriangle, Calendar, Settings, ChevronLeft, ChevronRight,
   Building2, ClipboardList, ShieldAlert, FileCheck,
   ShoppingCart, BarChart3, Boxes, LogOut, ShieldCheck,
-  UserCircle, Timer,
+  UserCircle, Timer, Briefcase, CalendarCheck, Hammer,
 } from 'lucide-react';
 import type { AuthRole } from '@/types';
 
+// ─── Tipos de navegación ──────────────────────────────────────────────────────
 interface NavItem {
   label: string;
   href: string;
@@ -27,7 +28,7 @@ interface NavGroup {
   items: NavItem[];
 }
 
-// ─── Nav para administrador ───────────────────────────────────────────────────
+// ─── Nav para ADMINISTRADOR (ve todo) ────────────────────────────────────────
 const administradorNav: NavGroup[] = [
   {
     title: 'Principal',
@@ -36,22 +37,23 @@ const administradorNav: NavGroup[] = [
       { label: 'Proyectos', href: '/proyectos', icon: FolderOpen },
       { label: 'Incidencias', href: '/incidencias', icon: AlertTriangle },
       { label: 'Reportes Diarios', href: '/reportes-diarios', icon: FileText },
+      { label: 'Galería Evidencias', href: '/galeria-evidencias', icon: Image },
     ],
   },
   {
-    title: 'Usuarios',
+    title: 'Gestión',
     items: [
-      { label: 'Gestión de Usuarios', href: '/usuarios', icon: Users },
+      { label: 'Usuarios', href: '/usuarios', icon: Users },
     ],
   },
   {
     title: 'Finanzas y RH',
     items: [
-      { label: 'Gastos de Obra', href: '/gastos-obra', icon: DollarSign },
       { label: 'Horarios', href: '/horarios', icon: Clock },
       { label: 'Reporte de Horas', href: '/reporte-horas', icon: FileBarChart },
       { label: 'Control Horario', href: '/control-horario', icon: ClipboardList },
       { label: 'Días No Laborales', href: '/dias-no-laborales', icon: Calendar },
+      { label: 'Gastos de Obra', href: '/gastos-obra', icon: DollarSign },
     ],
   },
   {
@@ -68,16 +70,7 @@ const administradorNav: NavGroup[] = [
     items: [
       { label: 'Materiales', href: '/catalogos/materiales', icon: Package },
       { label: 'Proveedores', href: '/catalogos/proveedores', icon: Truck },
-    ],
-  },
-  {
-    title: 'Más',
-    items: [
-      { label: 'Seguimiento de Obra', href: '/seguimiento-obra', icon: HardHat },
-      { label: 'Actividad Reciente', href: '/actividad-reciente', icon: Activity },
-      { label: 'Galería Evidencias', href: '/galeria-evidencias', icon: Image },
-      { label: 'Incidencias Críticas', href: '/incidencias-criticas', icon: ShieldAlert },
-      { label: 'Validar Reportes', href: '/validar-reportes', icon: CheckSquare },
+      { label: 'Clientes', href: '/catalogos/clientes', icon: Briefcase },
     ],
   },
   {
@@ -89,12 +82,12 @@ const administradorNav: NavGroup[] = [
   {
     title: 'Universal',
     items: [
-      { label: 'Asistencia (Checador)', href: '/asistencia', icon: Timer },
+      { label: 'Asistencia (Checador)', href: '/asistencia', icon: CalendarCheck },
     ],
   },
 ];
 
-// ─── Nav para gerente ──────────────────────────────────────────────────────────
+// ─── Nav para GERENTE (igual que Admin pero SIN Usuarios) ─────────────────────
 const gerenteNav: NavGroup[] = [
   {
     title: 'Principal',
@@ -103,16 +96,17 @@ const gerenteNav: NavGroup[] = [
       { label: 'Proyectos', href: '/proyectos', icon: FolderOpen },
       { label: 'Incidencias', href: '/incidencias', icon: AlertTriangle },
       { label: 'Reportes Diarios', href: '/reportes-diarios', icon: FileText },
+      { label: 'Galería Evidencias', href: '/galeria-evidencias', icon: Image },
     ],
   },
   {
     title: 'Finanzas y RH',
     items: [
-      { label: 'Gastos de Obra', href: '/gastos-obra', icon: DollarSign },
       { label: 'Horarios', href: '/horarios', icon: Clock },
       { label: 'Reporte de Horas', href: '/reporte-horas', icon: FileBarChart },
       { label: 'Control Horario', href: '/control-horario', icon: ClipboardList },
       { label: 'Días No Laborales', href: '/dias-no-laborales', icon: Calendar },
+      { label: 'Gastos de Obra', href: '/gastos-obra', icon: DollarSign },
     ],
   },
   {
@@ -129,51 +123,79 @@ const gerenteNav: NavGroup[] = [
     items: [
       { label: 'Materiales', href: '/catalogos/materiales', icon: Package },
       { label: 'Proveedores', href: '/catalogos/proveedores', icon: Truck },
-    ],
-  },
-  {
-    title: 'Más',
-    items: [
-      { label: 'Seguimiento de Obra', href: '/seguimiento-obra', icon: HardHat },
-      { label: 'Actividad Reciente', href: '/actividad-reciente', icon: Activity },
-      { label: 'Galería Evidencias', href: '/galeria-evidencias', icon: Image },
-      { label: 'Incidencias Críticas', href: '/incidencias-criticas', icon: ShieldAlert },
-      { label: 'Validar Reportes', href: '/validar-reportes', icon: CheckSquare },
+      { label: 'Clientes', href: '/catalogos/clientes', icon: Briefcase },
     ],
   },
   {
     title: 'Universal',
     items: [
-      { label: 'Asistencia (Checador)', href: '/asistencia', icon: Timer },
+      { label: 'Asistencia (Checador)', href: '/asistencia', icon: CalendarCheck },
     ],
   },
 ];
 
-// ─── Nav para supervisor e ingeniero (solo asistencia) ────────────────────────
-const campoNav: NavGroup[] = [
+// ─── Nav para INGENIERO (solo proyectos asignados + asistencia) ───────────────
+const ingenieroNav: NavGroup[] = [
   {
-    title: 'Mi Área',
+    title: 'Mi Trabajo',
     items: [
-      { label: 'Asistencia (Checador)', href: '/asistencia', icon: Timer },
+      { label: 'Mis Proyectos', href: '/proyectos', icon: FolderOpen },
+      { label: 'Incidencias', href: '/incidencias', icon: AlertTriangle },
+      { label: 'Galería Evidencias', href: '/galeria-evidencias', icon: Image },
+    ],
+  },
+  {
+    title: 'Universal',
+    items: [
+      { label: 'Asistencia (Checador)', href: '/asistencia', icon: CalendarCheck },
     ],
   },
 ];
 
+// ─── Nav para SUPERVISOR (proyectos asignados + reportes + asistencia) ────────
+const supervisorNav: NavGroup[] = [
+  {
+    title: 'Mi Trabajo',
+    items: [
+      { label: 'Mis Proyectos', href: '/proyectos', icon: FolderOpen },
+      { label: 'Registrar Avance', href: '/reportes-diarios', icon: Hammer },
+      { label: 'Incidencias', href: '/incidencias', icon: AlertTriangle },
+      { label: 'Galería Evidencias', href: '/galeria-evidencias', icon: Image },
+    ],
+  },
+  {
+    title: 'Universal',
+    items: [
+      { label: 'Asistencia (Checador)', href: '/asistencia', icon: CalendarCheck },
+    ],
+  },
+];
+
+// ─── Seleccionar nav según el rol ─────────────────────────────────────────────
 function getNavForRole(role: AuthRole | undefined): NavGroup[] {
   switch (role) {
     case 'administrador': return administradorNav;
     case 'gerente':       return gerenteNav;
-    case 'supervisor':
-    case 'ingeniero':     return campoNav;
+    case 'ingeniero':     return ingenieroNav;
+    case 'supervisor':    return supervisorNav;
     default:              return gerenteNav;
   }
 }
 
+// ─── Colores de badge por rol ─────────────────────────────────────────────────
 const roleColors: Record<string, string> = {
   administrador: 'bg-purple-500',
   gerente:       'bg-blue-600',
   supervisor:    'bg-amber-500',
   ingeniero:     'bg-emerald-500',
+};
+
+// ─── Etiquetas de rol en español ─────────────────────────────────────────────
+const roleLabels: Record<string, string> = {
+  administrador: 'Administrador',
+  gerente:       'Gerente',
+  supervisor:    'Supervisor',
+  ingeniero:     'Ingeniero',
 };
 
 export default function Sidebar() {
@@ -182,8 +204,10 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
 
+  // Obtener la navegación correspondiente al rol del usuario
   const navGroups = getNavForRole(currentUser?.rol?.nombre);
 
+  // Determinar si un enlace está activo
   const isActive = (href: string) => {
     if (href === '/dashboard') return pathname === '/dashboard';
     return pathname.startsWith(href);
@@ -195,6 +219,7 @@ export default function Sidebar() {
   };
 
   const roleBadgeColor = roleColors[currentUser?.rol?.nombre || ''] || 'bg-blue-600';
+  const roleLabelText  = roleLabels[currentUser?.rol?.nombre || ''] || currentUser?.rol?.nombre || '';
 
   // Calcular iniciales del nombre
   const getInitials = (name: string) => {
@@ -225,11 +250,16 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* User badge */}
+      {/* Badge del usuario con rol */}
       {!sidebarCollapsed && currentUser && (
         <div className="mx-3 mt-3 mb-1">
           <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-app border border-default">
-            <div className={cn('w-7 h-7 rounded-lg text-white flex items-center justify-center text-xs font-bold shrink-0', roleBadgeColor)}>
+            <div
+              className={cn(
+                'w-7 h-7 rounded-lg text-white flex items-center justify-center text-xs font-bold shrink-0',
+                roleBadgeColor
+              )}
+            >
               {currentUser.foto_perfil
                 ? <img src={currentUser.foto_perfil} alt="avatar" className="w-full h-full rounded-lg object-cover" />
                 : getInitials(currentUser.nombre)
@@ -237,22 +267,25 @@ export default function Sidebar() {
             </div>
             <div className="min-w-0">
               <p className="text-xs font-semibold text-primary truncate">{currentUser.nombre}</p>
-              <p className="text-[10px] text-muted capitalize">{currentUser.rol?.nombre}</p>
+              <p className="text-[10px] text-muted capitalize">{roleLabelText}</p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Nav */}
+      {/* Navegación dinámica por rol */}
       <nav className="flex-1 overflow-y-auto scrollbar-thin py-3 px-2">
         {navGroups.map((group) => (
           <div key={group.title} className="mb-4">
+            {/* Título de grupo (solo visible cuando el sidebar no está colapsado) */}
             {!sidebarCollapsed && (
               <p className="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted">
                 {group.title}
               </p>
             )}
+            {/* Separador visual cuando está colapsado */}
             {sidebarCollapsed && <div className="my-2 border-t border-default" />}
+
             {group.items.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.href);
@@ -269,6 +302,7 @@ export default function Sidebar() {
                 >
                   <Icon size={18} className="shrink-0" />
                   {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
+                  {/* Badge opcional (ej. conteo de notificaciones) */}
                   {!sidebarCollapsed && item.badge && (
                     <span className="ml-auto text-xs bg-brand-600 text-white rounded-full px-1.5 py-0.5 leading-none">
                       {item.badge}
@@ -281,7 +315,7 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Logout */}
+      {/* Pie: logout y colapsar */}
       <div className="border-t border-default">
         <button
           onClick={handleLogout}

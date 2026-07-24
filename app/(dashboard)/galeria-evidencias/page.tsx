@@ -1,82 +1,276 @@
 'use client';
-import { useState } from 'react';
-import { useStore } from '@/store/useStore';
-import Card, { CardHeader, CardTitle } from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
+
+import { useState, useEffect, useCallback } from 'react';
+import { proyectosService, ProyectoApi } from '@/lib/services/proyectos';
+import Card from '@/components/ui/Card';
 import { formatDate } from '@/lib/utils';
-import { Search, Image as ImageIcon, Filter } from 'lucide-react';
+import {
+  Image as ImageIcon,
+  ChevronDown,
+  Loader2,
+  AlertCircle,
+  RefreshCw,
+  X,
+  ZoomIn,
+  Folder,
+} from 'lucide-react';
 
+// ─── Tipos ────────────────────────────────────────────────────────────────────
+interface FotoItem {
+  url: string;
+  proyecto: string;
+  proyectoId: number;
+  fecha: string;
+  descripcion?: string;
+  reporteId?: number;
+}
+
+function getFotoUrl(foto: any): string {
+  if (typeof foto === 'string') return foto;
+  return foto?.url || foto?.ruta || foto?.path || '';
+}
+
+// ─── Skeleton ─────────────────────────────────────────────────────────────────
+function PhotoSkeleton() {
+  return (
+    <div className="aspect-square rounded-2xl bg-slate-200 dark:bg-slate-700 animate-pulse" />
+  );
+}
+
+// ─── Página ───────────────────────────────────────────────────────────────────
 export default function GaleriaEvidenciasPage() {
-  const { reportes, proyectos, incidencias } = useStore();
-  const [search, setSearch] = useState('');
-  const [filterProyecto, setFilterProyecto] = useState('');
-  const [filterTipo, setFilterTipo] = useState('todos'); // 'todos', 'reportes', 'incidencias'
-  const [fotoModal, setFotoModal] = useState<string | null>(null);
+  const [proyectos, setProyectos] = useState<ProyectoApi[]>([]);
+  const [selectedProyecto, setSelectedProyecto] = useState<string>('');
+  const [fotos, setFotos] = useState<FotoItem[]>([]);
+  const [loadingProyectos, setLoadingProyectos] = useState(true);
+  const [loadingFotos, setLoadingFotos] = useState(false);
+  const [errorProyectos, setErrorProyectos] = useState<string | null>(null);
+  const [errorFotos, setErrorFotos] = useState<string | null>(null);
+  const [fotoModal, setFotoModal] = useState<FotoItem | null>(null);
 
-  // Extraer todas las fotos de reportes e incidencias
-  const fotosReportes = reportes.flatMap(r => 
-    r.fotos.map(f => ({ url: f, tipo: 'Reporte', origenId: r.id, proyectoId: r.proyectoId, proyectoNombre: r.proyecto, fecha: r.fecha, descripcion: r.descripcion }))
-  );
-  const fotosIncidencias = incidencias.flatMap(i => 
-    i.fotos.map(f => ({ url: f, tipo: 'Incidencia', origenId: i.id, proyectoId: i.proyectoId, proyectoNombre: i.proyecto, fecha: i.fechaCreacion.split('T')[0], descripcion: i.titulo }))
-  );
+  // ── Cargar proyectos del usuario ────────────────────────────────────────────
+  const fetchProyectos = useCallback(async () => {
+    setLoadingProyectos(true);
+    setErrorProyectos(null);
+    try {
+      const data = await proyectosService.getProyectos();
+      setProyectos(data);
+      // Auto-seleccionar el primero si existe
+      if (data.length > 0 && !selectedProyecto) {
+        setSelectedProyecto(String(data[0].id));
+      }
+    } catch (err: any) {
+      setErrorProyectos(err.message || 'Error al cargar proyectos.');
+    } finally {
+      setLoadingProyectos(false);
+    }
+  }, []);
 
-  const todasLasFotos = [...fotosReportes, ...fotosIncidencias].sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+  useEffect(() => { fetchProyectos(); }, [fetchProyectos]);
 
-  const filtered = todasLasFotos.filter(f => {
-    const q = search.toLowerCase();
-    const matchQ = f.proyectoNombre.toLowerCase().includes(q) || f.descripcion.toLowerCase().includes(q);
-    const matchP = !filterProyecto || f.proyectoId === filterProyecto;
-    const matchT = filterTipo === 'todos' || (filterTipo === 'reportes' && f.tipo === 'Reporte') || (filterTipo === 'incidencias' && f.tipo === 'Incidencia');
-    return matchQ && matchP && matchT;
-  });
+  // ── Cargar fotos del proyecto seleccionado ──────────────────────────────────
+  const fetchFotos = useCallback(async () => {
+    if (!selectedProyecto) return;
+    setLoadingFotos(true);
+    setErrorFotos(null);
+    setFotos([]);
+    try {
+      const proyecto = proyectos.find(p => String(p.id) === selectedProyecto);
+      const nombreProyecto = proyecto?.nombre || `Proyecto #${selectedProyecto}`;
+
+      const reportes = await proyectosService.getReportes(selectedProyecto);
+      const items: FotoItem[] = [];
+
+      reportes.forEach((reporte: any) => {
+        const fotosList: any[] = reporte.fotos || reporte.evidencias || [];
+        fotosList.forEach((foto: any) => {
+          const url = getFotoUrl(foto);
+          if (url) {
+            items.push({
+              url,
+              proyecto: nombreProyecto,
+              proyectoId: Number(selectedProyecto),
+              fecha: reporte.fecha || reporte.created_at || '',
+              descripcion: reporte.descripcion,
+              reporteId: reporte.id,
+            });
+          }
+        });
+      });
+
+      setFotos(items);
+    } catch (err: any) {
+      setErrorFotos(err.message || 'Error al cargar fotos.');
+    } finally {
+      setLoadingFotos(false);
+    }
+  }, [selectedProyecto, proyectos]);
+
+  useEffect(() => {
+    if (selectedProyecto) fetchFotos();
+  }, [selectedProyecto]);
+
+  const proyectoActual = proyectos.find(p => String(p.id) === selectedProyecto);
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader><CardTitle>Galería de Evidencias Fotográficas</CardTitle></CardHeader>
-
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          <div className="relative flex-1">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-            <input className="input-base pl-9" placeholder="Buscar por proyecto o descripción..." value={search} onChange={e => setSearch(e.target.value)} />
-          </div>
-          <select className="input-base sm:w-52" value={filterProyecto} onChange={e => setFilterProyecto(e.target.value)}>
-            <option value="">Todos los proyectos</option>
-            {proyectos.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
-          </select>
-          <select className="input-base sm:w-40" value={filterTipo} onChange={e => setFilterTipo(e.target.value)}>
-            <option value="todos">Todas las fotos</option>
-            <option value="reportes">Solo Reportes</option>
-            <option value="incidencias">Solo Incidencias</option>
-          </select>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
+            <ImageIcon size={24} className="text-brand-600" /> Galería de Evidencias
+          </h1>
+          <p className="text-sm text-muted mt-0.5">Fotografías y respaldos visuales de obra</p>
         </div>
+        {selectedProyecto && !loadingFotos && (
+          <button onClick={fetchFotos}
+            className="btn-secondary inline-flex items-center gap-2 text-xs">
+            <RefreshCw size={14} /> Actualizar
+          </button>
+        )}
+      </div>
 
-        {filtered.length > 0 ? (
-          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
-            {filtered.map((foto, idx) => (
-              <div key={idx} className="break-inside-avoid relative group rounded-xl overflow-hidden cursor-pointer bg-slate-100 dark:bg-slate-800" onClick={() => setFotoModal(foto.url)}>
-                <img src={foto.url} alt="Evidencia" className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                  <Badge variant={foto.tipo === 'Reporte' ? 'info' : 'danger'} size="sm" className="w-fit mb-2">{foto.tipo}</Badge>
-                  <p className="text-white text-xs font-semibold truncate">{foto.proyectoNombre}</p>
-                  <p className="text-white/80 text-[10px] mt-1 line-clamp-2">{foto.descripcion}</p>
-                  <p className="text-white/60 text-[10px] mt-2">{formatDate(foto.fecha)}</p>
-                </div>
-              </div>
-            ))}
+      {/* Selector de Proyecto */}
+      <Card className="p-4">
+        <label className="text-xs font-semibold text-secondary mb-2 block flex items-center gap-1.5">
+          <Folder size={14} /> Seleccionar Proyecto
+        </label>
+
+        {loadingProyectos ? (
+          <div className="flex items-center gap-2 text-xs text-muted">
+            <Loader2 size={14} className="animate-spin" /> Cargando proyectos...
           </div>
+        ) : errorProyectos ? (
+          <div className="flex items-center gap-2 text-xs text-red-600">
+            <AlertCircle size={14} /> {errorProyectos}
+            <button onClick={fetchProyectos} className="underline">Reintentar</button>
+          </div>
+        ) : proyectos.length === 0 ? (
+          <p className="text-xs text-muted">No tienes proyectos asignados.</p>
         ) : (
-          <div className="py-16 text-center text-muted flex flex-col items-center">
-            <ImageIcon size={48} className="mb-4 opacity-20" />
-            <p className="text-sm">No se encontraron fotografías con los filtros actuales</p>
+          <div className="relative">
+            <select
+              value={selectedProyecto}
+              onChange={e => setSelectedProyecto(e.target.value)}
+              className="input-base pr-10 appearance-none">
+              <option value="">— Selecciona un proyecto —</option>
+              {proyectos.map(p => (
+                <option key={p.id} value={String(p.id)}>
+                  {p.codigo ? `${p.codigo} · ` : ''}{p.nombre}
+                </option>
+              ))}
+            </select>
+            <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
           </div>
         )}
       </Card>
 
+      {/* Estado: sin proyecto seleccionado */}
+      {!selectedProyecto && !loadingProyectos && proyectos.length > 0 && (
+        <Card className="p-12 text-center space-y-3">
+          <div className="w-16 h-16 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
+            <ImageIcon size={32} />
+          </div>
+          <h2 className="text-lg font-semibold text-primary">Selecciona un Proyecto</h2>
+          <p className="text-sm text-muted">Elige un proyecto del dropdown para ver sus evidencias fotográficas.</p>
+        </Card>
+      )}
+
+      {/* Error al cargar fotos */}
+      {errorFotos && selectedProyecto && (
+        <Card className="p-6 text-center border-red-200 dark:border-red-900/30 space-y-3">
+          <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/20 text-red-600 flex items-center justify-center mx-auto">
+            <AlertCircle size={20} />
+          </div>
+          <p className="text-sm text-secondary">{errorFotos}</p>
+          <button onClick={fetchFotos} className="btn-secondary text-xs inline-flex items-center gap-2">
+            <RefreshCw size={14} /> Reintentar
+          </button>
+        </Card>
+      )}
+
+      {/* Grid de fotos */}
+      {selectedProyecto && (
+        <>
+          {proyectoActual && (
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-primary">{proyectoActual.nombre}</h2>
+              {!loadingFotos && (
+                <span className="text-xs text-muted">
+                  · {fotos.length} foto{fotos.length !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
+            {loadingFotos
+              ? Array.from({ length: 10 }).map((_, i) => <PhotoSkeleton key={i} />)
+              : fotos.length === 0 && !errorFotos
+                ? (
+                  <div className="col-span-full py-16 text-center space-y-3">
+                    <ImageIcon size={40} className="text-muted mx-auto" />
+                    <p className="text-sm font-medium text-secondary">Sin evidencias fotográficas</p>
+                    <p className="text-xs text-muted">
+                      Este proyecto aún no tiene fotos en sus reportes de avance.
+                    </p>
+                  </div>
+                )
+                : fotos.map((foto, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setFotoModal(foto)}
+                    className="group relative aspect-square rounded-2xl overflow-hidden border border-default hover:border-brand-400 transition-all shadow-sm hover:shadow-md">
+                    <img
+                      src={foto.url}
+                      alt={`Evidencia ${i + 1}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    {/* Overlay en hover */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                      <ZoomIn size={20} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    {/* Fecha */}
+                    {foto.fecha && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <p className="text-[10px] text-white">{formatDate(foto.fecha)}</p>
+                      </div>
+                    )}
+                  </button>
+                ))
+            }
+          </div>
+        </>
+      )}
+
+      {/* Modal visor */}
       {fotoModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm" onClick={() => setFotoModal(null)}>
-          <img src={fotoModal} alt="Foto ampliada" className="max-w-full max-h-full rounded-xl object-contain shadow-2xl" />
+        <div
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-black/95"
+          onClick={() => setFotoModal(null)}>
+          <button
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+            onClick={() => setFotoModal(null)}>
+            <X size={20} />
+          </button>
+
+          <img
+            src={fotoModal.url}
+            alt="Evidencia ampliada"
+            className="max-w-full max-h-[80vh] rounded-xl object-contain shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          />
+
+          {(fotoModal.fecha || fotoModal.descripcion) && (
+            <div className="mt-4 text-center space-y-1" onClick={e => e.stopPropagation()}>
+              {fotoModal.fecha && (
+                <p className="text-xs text-white/70">{formatDate(fotoModal.fecha)}</p>
+              )}
+              {fotoModal.descripcion && (
+                <p className="text-sm text-white/90 max-w-lg">{fotoModal.descripcion}</p>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

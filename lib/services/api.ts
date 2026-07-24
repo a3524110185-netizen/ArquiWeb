@@ -53,7 +53,7 @@ async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise
   headers.set('Accept', 'application/json');
   headers.set('ngrok-skip-browser-warning', 'true');
 
-  // Leer token solo en el navegador (evita errores de SSR)
+  // Leer token y rol solo en el navegador (evita errores de SSR)
   let token: string | null = null;
   if (typeof window !== 'undefined') {
     token = localStorage.getItem('auth_token');
@@ -64,6 +64,15 @@ async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise
   }
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  // Enviar el rol del usuario en cada petición.
+  // El backend usa este header para que admin/gerente puedan acceder
+  // a recursos sin estar en proyecto_usuario (bypass de verificación de proyecto).
+  if (typeof window !== 'undefined') {
+    const rolMatch = document.cookie.match(new RegExp('(^| )auth_role=([^;]+)'));
+    const rol = rolMatch ? rolMatch[2] : null;
+    if (rol) headers.set('X-User-Rol', rol);
   }
 
   const response = await fetch(url, { ...options, headers });

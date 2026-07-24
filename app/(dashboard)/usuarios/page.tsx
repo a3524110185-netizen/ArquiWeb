@@ -59,7 +59,7 @@ export default function UsuariosPage() {
     if (!validate()) return;
     const initials = form.nombre.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
     if (modal === 'create') {
-      addUsuario({ ...form, avatar: initials, ultimoAcceso: new Date().toISOString(), empresaId: currentUser?.empresaId || 'e1' });
+      addUsuario({ ...form, avatar: initials, ultimoAcceso: new Date().toISOString(), empresaId: (currentUser as any)?.empresaId || 'e1' });
       toast.success('Usuario creado', `${form.nombre} agregado exitosamente`);
     } else if (editId) {
       updateUsuario(editId, { ...form, avatar: initials });

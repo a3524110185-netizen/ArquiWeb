@@ -22,12 +22,12 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
       if (!token) {
         router.replace('/login');
       }
-    } else if (isAuthenticated && currentUser?.authRole !== 'SuperAdmin') {
+    } else if (isAuthenticated && (currentUser as any)?.authRole !== 'SuperAdmin' && currentUser?.rol?.nombre !== 'administrador') {
       router.replace('/dashboard');
     }
   }, [isAuthenticated, currentUser, router]);
 
-  if (!currentUser || currentUser.authRole !== 'SuperAdmin') return null;
+  if (!currentUser || ((currentUser as any)?.authRole !== 'SuperAdmin' && currentUser?.rol?.nombre !== 'administrador')) return null;
 
   return (
     <div className="min-h-screen bg-app">

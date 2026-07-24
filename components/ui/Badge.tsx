@@ -78,7 +78,26 @@ export function rolVariant(r: string): BadgeVariant {
 
 export function proyectoEstadoVariant(s: string): BadgeVariant {
   const map: Record<string, BadgeVariant> = {
-    'En progreso': 'info', 'Completado': 'success', 'Pausado': 'warning', 'Por iniciar': 'gray',
+    'planeado': 'gray',
+    'a_tiempo': 'success',
+    'retrasado': 'warning',
+    'critico': 'danger',
+    'completado': 'info',
+    'En progreso': 'info',
+    'Completado': 'success',
+    'Pausado': 'warning',
+    'Por iniciar': 'gray',
   };
   return map[s] ?? 'gray';
+}
+
+export function getEstadoLabel(s: string): string {
+  const map: Record<string, string> = {
+    'planeado': 'Planeado',
+    'a_tiempo': 'A Tiempo',
+    'retrasado': 'Retrasado',
+    'critico': 'Crítico',
+    'completado': 'Completado',
+  };
+  return map[s] ?? s;
 }

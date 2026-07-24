@@ -1,254 +1,304 @@
 'use client';
-import { useStore } from '@/store/useStore';
-import Card, { CardHeader, CardTitle } from '@/components/ui/Card';
-import Badge, { severidadVariant, proyectoEstadoVariant } from '@/components/ui/Badge';
-import { formatCurrency, formatDate } from '@/lib/utils';
-import {
-  BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell
-} from 'recharts';
-import {
-  FolderOpen, AlertTriangle, Clock, DollarSign,
-  TrendingUp, TrendingDown, ArrowRight, CheckCircle
-} from 'lucide-react';
-import Link from 'next/link';
-import type { Metadata } from 'next';
 
-// KPI Card
-function KpiCard({ title, value, subtitle, icon: Icon, trend, color }: {
-  title: string; value: string; subtitle?: string;
-  icon: React.ElementType; trend?: { value: number; label: string }; color: string;
-}) {
-  const positive = trend && trend.value >= 0;
-  return (
-    <Card className="relative overflow-hidden">
-      <div className={`absolute top-0 right-0 w-24 h-24 rounded-full opacity-10 -translate-y-8 translate-x-8`}
-        style={{ background: color }} />
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs font-medium text-secondary mb-1">{title}</p>
-          <p className="text-2xl font-bold text-primary">{value}</p>
-          {subtitle && <p className="text-xs text-muted mt-1">{subtitle}</p>}
-        </div>
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-          style={{ background: color + '20' }}>
-          <Icon size={20} style={{ color }} />
-        </div>
-      </div>
-      {trend && (
-        <div className="flex items-center gap-1 mt-3 pt-3 border-t border-default">
-          {positive
-            ? <TrendingUp size={12} className="text-emerald-500" />
-            : <TrendingDown size={12} className="text-red-500" />}
-          <span className={`text-xs font-medium ${positive ? 'text-emerald-600' : 'text-red-500'}`}>
-            {positive ? '+' : ''}{trend.value}%
-          </span>
-          <span className="text-xs text-muted">{trend.label}</span>
-        </div>
-      )}
-    </Card>
-  );
+import { useState, useEffect, useCallback } from 'react';
+import { useAuthStore } from '@/store/useAuthStore';
+import Card, { CardHeader, CardTitle } from '@/components/ui/Card';
+import {
+  LayoutDashboard,
+  Users,
+  FolderOpen,
+  AlertTriangle,
+  Clock,
+  Activity,
+  Image as ImageIcon,
+  RefreshCw,
+  Loader2,
+  ClipboardList,
+} from 'lucide-react';
+import { proyectosService, ProyectoApi, ReporteApi } from '@/lib/services/proyectos';
+import { formatDate } from '@/lib/utils';
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+interface ReporteConProyecto extends ReporteApi {
+  proyectoNombre: string;
 }
 
-const COLORS = ['#2563EB', '#0EA5E9', '#7C3AED', '#059669', '#D97706'];
+function tiempoRelativo(fechaStr: string): string {
+  const fecha = new Date(fechaStr);
+  const ahora = new Date();
+  const diffMs = ahora.getTime() - fecha.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHrs = Math.floor(diffMin / 60);
+  const diffDias = Math.floor(diffHrs / 24);
 
+  if (diffMin < 1) return 'hace un momento';
+  if (diffMin < 60) return `hace ${diffMin} min`;
+  if (diffHrs < 24) return `hace ${diffHrs} hora${diffHrs !== 1 ? 's' : ''}`;
+  if (diffDias < 7) return `hace ${diffDias} día${diffDias !== 1 ? 's' : ''}`;
+  return formatDate(fechaStr);
+}
+
+function avanceColor(avance: number): string {
+  if (avance <= 25) return 'text-red-500';
+  if (avance <= 50) return 'text-orange-500';
+  if (avance <= 75) return 'text-yellow-500';
+  return 'text-emerald-500';
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
-  const { proyectos, incidencias, gastos, horarios } = useStore();
+  const { currentUser } = useAuthStore();
 
-  const proyectosActivos = proyectos.filter(p => p.estado === 'En progreso').length;
-  const incidenciasCriticas = incidencias.filter(i => (i.severidad === 'Crítica' || i.severidad === 'Alta') && i.estado !== 'Cerrado' && i.estado !== 'Resuelto').length;
-  const gastosTotal = gastos.reduce((acc, g) => acc + g.monto, 0);
-  const horasHoy = horarios.filter(h => h.fecha === '2025-05-30').reduce((acc, h) => acc + h.horasNormales + h.horasExtras, 0);
+  const [proyectos, setProyectos] = useState<ProyectoApi[]>([]);
+  const [reportesRecientes, setReportesRecientes] = useState<ReporteConProyecto[]>([]);
+  const [loadingKpis, setLoadingKpis] = useState(true);
+  const [loadingReportes, setLoadingReportes] = useState(true);
 
-  // Avance físico vs financiero
-  const avanceData = proyectos.map(p => ({
-    name: p.nombre.split(' ').slice(0, 2).join(' '),
-    físico: p.avanceFisico,
-    financiero: p.avanceFinanciero,
-  }));
+  const roleName = currentUser?.rol?.nombre || 'Usuario';
+  const roleLabels: Record<string, string> = {
+    administrador: 'Administrador',
+    gerente: 'Gerente',
+    supervisor: 'Supervisor',
+    ingeniero: 'Ingeniero',
+  };
 
-  // Tendencia 7 días (simulada)
-  const tendenciaData = [
-    { dia: 'Lun', incidencias: 1, reportes: 3 },
-    { dia: 'Mar', incidencias: 2, reportes: 4 },
-    { dia: 'Mié', incidencias: 0, reportes: 5 },
-    { dia: 'Jue', incidencias: 3, reportes: 2 },
-    { dia: 'Vie', incidencias: 1, reportes: 6 },
-    { dia: 'Sáb', incidencias: 0, reportes: 1 },
-    { dia: 'Hoy', incidencias: 2, reportes: 3 },
-  ];
+  // Carga de proyectos para KPIs
+  const fetchProyectos = useCallback(async () => {
+    setLoadingKpis(true);
+    try {
+      const data = await proyectosService.getProyectos();
+      setProyectos(data);
+    } catch {
+      // silencioso, se muestra "--"
+    } finally {
+      setLoadingKpis(false);
+    }
+  }, []);
 
-  // Gastos por categoría
-  const gastosCat: Record<string, number> = {};
-  gastos.forEach(g => { gastosCat[g.categoria] = (gastosCat[g.categoria] ?? 0) + g.monto; });
-  const gastosChartData = Object.entries(gastosCat).map(([name, value]) => ({ name, value }));
+  // Carga de reportes recientes (últimos 10 de todos los proyectos)
+  const fetchReportesRecientes = useCallback(async () => {
+    setLoadingReportes(true);
+    try {
+      const proyectosData = await proyectosService.getProyectos();
+      const resultados = await Promise.allSettled(
+        proyectosData.map((p) =>
+          proyectosService.getReportes(p.id).then((reportes) =>
+            reportes.map((r) => ({ ...r, proyectoNombre: p.nombre }))
+          )
+        )
+      );
 
-  const incCriticas = incidencias.filter(i => i.severidad === 'Crítica' || i.severidad === 'Alta').slice(0, 3);
+      const todos: ReporteConProyecto[] = [];
+      resultados.forEach((r) => {
+        if (r.status === 'fulfilled') todos.push(...r.value);
+      });
+
+      // Ordenar por fecha descendente y tomar los primeros 10
+      todos.sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      setReportesRecientes(todos.slice(0, 10));
+    } catch {
+      // silencioso
+    } finally {
+      setLoadingReportes(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProyectos();
+    fetchReportesRecientes();
+  }, [fetchProyectos, fetchReportesRecientes]);
+
+  // KPIs derivados
+  const proyectosActivos = proyectos.filter(
+    (p) => p.estado === 'a_tiempo' || p.estado === 'retrasado' || p.estado === 'critico'
+  ).length;
+  const totalPresupuesto = proyectos.reduce((s, p) => s + (p.presupuesto ?? 0), 0);
 
   return (
     <div className="space-y-6">
-      {/* KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard title="Proyectos Activos" value={`${proyectosActivos}`} subtitle={`${proyectos.length} en total`}
-          icon={FolderOpen} color="#2563EB" trend={{ value: 0, label: 'sin cambios' }} />
-        <KpiCard title="Incidencias Críticas/Alta" value={`${incidenciasCriticas}`} subtitle="Sin resolver"
-          icon={AlertTriangle} color="#EF4444" trend={{ value: -1, label: 'vs ayer' }} />
-        <KpiCard title="Horas Trabajadas Hoy" value={`${horasHoy}h`} subtitle="3 trabajadores"
-          icon={Clock} color="#0EA5E9" trend={{ value: 5, label: 'vs promedio' }} />
-        <KpiCard title="Gastos del Mes" value={formatCurrency(gastosTotal)} subtitle="Todos los proyectos"
-          icon={DollarSign} color="#7C3AED" trend={{ value: 12, label: 'vs mes anterior' }} />
+      {/* Header Bienvenida */}
+      <div className="p-6 rounded-2xl bg-gradient-to-r from-brand-600 via-brand-700 to-accent text-white shadow-lg">
+        <h1 className="text-2xl sm:text-3xl font-bold">
+          ¡Bienvenido, {currentUser?.nombre || 'Usuario'}!
+        </h1>
+        <p className="mt-2 text-brand-100 text-sm sm:text-base flex items-center gap-2">
+          <span>Rol actual:</span>
+          <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white font-medium text-xs uppercase tracking-wider">
+            {roleLabels[roleName] || roleName}
+          </span>
+        </p>
       </div>
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Avance físico vs financiero */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Avance Físico vs Financiero (%)</CardTitle>
-            <span className="text-xs text-muted">Por proyecto</span>
-          </CardHeader>
-          <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={avanceData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} />
-              <YAxis tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} domain={[0, 100]} />
-              <Tooltip
-                contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-                formatter={(v: any) => [`${v}%`]}
-              />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Bar dataKey="físico" fill="#2563EB" radius={[4, 4, 0, 0]} name="Físico" />
-              <Bar dataKey="financiero" fill="#0EA5E9" radius={[4, 4, 0, 0]} name="Financiero" />
-            </BarChart>
-          </ResponsiveContainer>
+      {/* KPIs */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-brand-50 dark:bg-brand-900/20 text-brand-600 flex items-center justify-center shrink-0">
+            <FolderOpen size={24} />
+          </div>
+          <div>
+            <p className="text-xs text-muted font-medium">Proyectos Activos</p>
+            <p className="text-2xl font-bold text-primary mt-0.5">
+              {loadingKpis ? <Loader2 size={18} className="animate-spin text-muted" /> : proyectosActivos}
+            </p>
+            <p className="text-[10px] text-muted">{proyectos.length} proyectos en total</p>
+          </div>
         </Card>
 
-        {/* Gastos por categoría */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Gastos por Categoría</CardTitle>
-          </CardHeader>
-          <ResponsiveContainer width="100%" height={200}>
-            <PieChart>
-              <Pie data={gastosChartData} cx="50%" cy="50%" innerRadius={55} outerRadius={80}
-                dataKey="value" nameKey="name" paddingAngle={3}>
-                {gastosChartData.map((_, i) => (
-                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-                formatter={(v: any) => [formatCurrency(v)]}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="space-y-1.5 mt-2">
-            {gastosChartData.map((d, i) => (
-              <div key={d.name} className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
-                  <span className="text-secondary">{d.name}</span>
+        <Card className="p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 flex items-center justify-center shrink-0">
+            <ClipboardList size={24} />
+          </div>
+          <div>
+            <p className="text-xs text-muted font-medium">Reportes Totales</p>
+            <p className="text-2xl font-bold text-primary mt-0.5">
+              {loadingReportes
+                ? <Loader2 size={18} className="animate-spin text-muted" />
+                : reportesRecientes.length >= 10 ? '10+' : reportesRecientes.length}
+            </p>
+            <p className="text-[10px] text-muted">Últimos registrados</p>
+          </div>
+        </Card>
+
+        <Card className="p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-900/20 text-sky-600 flex items-center justify-center shrink-0">
+            <Activity size={24} />
+          </div>
+          <div>
+            <p className="text-xs text-muted font-medium">Avance Promedio</p>
+            <p className="text-2xl font-bold text-primary mt-0.5">
+              {loadingKpis ? (
+                <Loader2 size={18} className="animate-spin text-muted" />
+              ) : proyectos.length > 0 ? (
+                `${Math.round(
+                  proyectos.reduce((s, p) => s + (p.avance ?? p.avance_fisico ?? 0), 0) / proyectos.length
+                )}%`
+              ) : '--'}
+            </p>
+            <p className="text-[10px] text-muted">Físico de proyectos</p>
+          </div>
+        </Card>
+
+        <Card className="p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center shrink-0">
+            <Users size={24} />
+          </div>
+          <div>
+            <p className="text-xs text-muted font-medium">Supervisores</p>
+            <p className="text-2xl font-bold text-primary mt-0.5">
+              {loadingReportes ? (
+                <Loader2 size={18} className="animate-spin text-muted" />
+              ) : (
+                new Set(reportesRecientes.map((r) => r.usuario?.id)).size
+              )}
+            </p>
+            <p className="text-[10px] text-muted">Con actividad reciente</p>
+          </div>
+        </Card>
+      </div>
+
+      {/* Timeline de Actividad Reciente */}
+      <Card className="p-6">
+        <CardHeader className="p-0 pb-4 border-b border-default">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Clock size={18} className="text-brand-600" />
+            <span>Actividad Reciente</span>
+            {!loadingReportes && reportesRecientes.length > 0 && (
+              <span className="text-xs font-normal text-muted">(últimos {reportesRecientes.length} reportes)</span>
+            )}
+          </CardTitle>
+          <button
+            onClick={fetchReportesRecientes}
+            disabled={loadingReportes}
+            className="inline-flex items-center gap-1.5 text-xs text-brand-600 hover:text-brand-800 font-medium disabled:opacity-50 transition-colors"
+          >
+            <RefreshCw size={13} className={loadingReportes ? 'animate-spin' : ''} />
+            Actualizar
+          </button>
+        </CardHeader>
+
+        {/* Loading */}
+        {loadingReportes && (
+          <div className="pt-4 space-y-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex gap-3">
+                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 animate-pulse shrink-0" />
+                <div className="flex-1 space-y-2 pt-1">
+                  <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded animate-pulse w-3/4" />
+                  <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded animate-pulse w-1/2" />
                 </div>
-                <span className="font-medium text-primary">{formatCurrency(d.value)}</span>
               </div>
             ))}
           </div>
-        </Card>
-      </div>
+        )}
 
-      {/* Tendencia + Incidencias */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Tendencia 7 días */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Tendencia Semanal</CardTitle>
-            <span className="text-xs text-muted">Últimos 7 días</span>
-          </CardHeader>
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={tendenciaData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="dia" tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} />
-              <YAxis tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} />
-              <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }} />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Line type="monotone" dataKey="incidencias" stroke="#EF4444" strokeWidth={2} dot={{ r: 4 }} name="Incidencias" />
-              <Line type="monotone" dataKey="reportes" stroke="#2563EB" strokeWidth={2} dot={{ r: 4 }} name="Reportes" />
-            </LineChart>
-          </ResponsiveContainer>
-        </Card>
-
-        {/* Incidencias críticas */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Incidencias Críticas/Alta</CardTitle>
-            <Link href="/incidencias-criticas" className="text-xs text-brand-600 hover:underline flex items-center gap-1">
-              Ver todas <ArrowRight size={12} />
-            </Link>
-          </CardHeader>
-          <div className="space-y-3">
-            {incCriticas.map(inc => (
-              <Link key={inc.id} href={`/incidencias/${inc.id}`}
-                className="block p-3 rounded-lg bg-app hover:bg-brand-50 dark:hover:bg-brand-900/10 transition-colors">
-                <div className="flex items-start justify-between gap-2 mb-1">
-                  <p className="text-xs font-medium text-primary truncate">{inc.titulo}</p>
-                  <Badge variant={severidadVariant(inc.severidad)} size="sm">{inc.severidad}</Badge>
-                </div>
-                <p className="text-[10px] text-muted">{inc.proyecto}</p>
-              </Link>
-            ))}
+        {/* Empty */}
+        {!loadingReportes && reportesRecientes.length === 0 && (
+          <div className="py-10 text-center space-y-2">
+            <Activity size={36} className="mx-auto text-slate-300 dark:text-slate-600" />
+            <p className="text-sm text-muted">No hay actividad reciente registrada.</p>
           </div>
-        </Card>
-      </div>
+        )}
 
-      {/* Proyectos resumen */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Resumen de Proyectos</CardTitle>
-          <Link href="/proyectos/p1" className="text-xs text-brand-600 hover:underline flex items-center gap-1">
-            Ver detalle <ArrowRight size={12} />
-          </Link>
-        </CardHeader>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-default">
-                {['Proyecto', 'Responsable', 'Avance Físico', 'Avance Financiero', 'Estado', 'Fecha Fin'].map(h => (
-                  <th key={h} className="text-left py-2 px-3 text-xs font-semibold text-secondary first:pl-0 last:pr-0">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {proyectos.map(p => (
-                <tr key={p.id} className="border-b border-default last:border-0 hover:bg-app transition-colors">
-                  <td className="py-3 px-3 pl-0">
-                    <p className="text-xs font-medium text-primary">{p.nombre}</p>
-                  </td>
-                  <td className="py-3 px-3 text-xs text-secondary">{p.responsable}</td>
-                  <td className="py-3 px-3">
-                    <div className="flex items-center gap-2">
-                      <div className="progress-bar w-24 flex-shrink-0">
-                        <div className="progress-fill" style={{ width: `${p.avanceFisico}%` }} />
-                      </div>
-                      <span className="text-xs font-medium text-primary">{p.avanceFisico}%</span>
+        {/* Timeline */}
+        {!loadingReportes && reportesRecientes.length > 0 && (
+          <div className="pt-4 space-y-0">
+            {reportesRecientes.map((reporte, index) => {
+              const fotoPrincipal =
+                reporte.fotos?.find((f) => f.es_principal) ?? reporte.fotos?.[0];
+              const isLast = index === reportesRecientes.length - 1;
+
+              return (
+                <div key={reporte.id} className="flex gap-3 group">
+                  {/* Timeline connector */}
+                  <div className="flex flex-col items-center shrink-0">
+                    <div className="w-9 h-9 rounded-full gradient-brand text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm z-10">
+                      {reporte.usuario?.nombre?.charAt(0).toUpperCase() ?? '?'}
                     </div>
-                  </td>
-                  <td className="py-3 px-3">
-                    <div className="flex items-center gap-2">
-                      <div className="progress-bar w-24 flex-shrink-0">
-                        <div className="progress-fill" style={{ width: `${p.avanceFinanciero}%`, background: 'linear-gradient(90deg, #7C3AED, #0EA5E9)' }} />
+                    {!isLast && <div className="w-px flex-1 bg-border my-1 ml-0" />}
+                  </div>
+
+                  {/* Content */}
+                  <div className={`flex-1 pb-4 ${isLast ? '' : ''}`}>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-primary">
+                          <span className="font-semibold">{reporte.usuario?.nombre}</span>
+                          {' registró avance del '}
+                          <span className={`font-bold ${avanceColor(reporte.avance)}`}>
+                            {reporte.avance}%
+                          </span>
+                          {' en '}
+                          <span className="font-medium">{reporte.proyectoNombre}</span>
+                        </p>
+                        <p className="text-xs text-muted mt-0.5">
+                          {tiempoRelativo(reporte.created_at)} · {reporte.turno} · {reporte.categoria}
+                        </p>
+                        {reporte.descripcion && (
+                          <p className="text-xs text-secondary mt-1 line-clamp-1 italic">
+                            "{reporte.descripcion}"
+                          </p>
+                        )}
                       </div>
-                      <span className="text-xs font-medium text-primary">{p.avanceFinanciero}%</span>
+
+                      {/* Thumbnail */}
+                      {fotoPrincipal && (
+                        <div className="w-14 h-14 rounded-xl overflow-hidden border border-default shrink-0 shadow-sm">
+                          <img
+                            src={fotoPrincipal.url}
+                            alt="Evidencia"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
                     </div>
-                  </td>
-                  <td className="py-3 px-3">
-                    <Badge variant={proyectoEstadoVariant(p.estado)} dot>{p.estado}</Badge>
-                  </td>
-                  <td className="py-3 px-3 pr-0 text-xs text-secondary">{formatDate(p.fechaFin)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </Card>
     </div>
   );

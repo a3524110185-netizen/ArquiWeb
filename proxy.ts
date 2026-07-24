@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Rutas públicas (sin autenticación)
+// ─── Rutas públicas (no requieren autenticación) ──────────────────────────────
 const PUBLIC_PATHS = ['/login', '/no-autorizado'];
 
 /**
  * Mapa de rutas protegidas por rol.
  * Un rol tiene acceso a una ruta si al menos uno de sus prefijos coincide.
- * El rol 'administrador' tiene acceso a todo excepto super-admin.
+ *
+ * REGLA DE ORO: /asistencia es accesible para los 4 roles.
+ * Administrador ve todo. Gerente ve todo menos gestión de usuarios.
+ * Ingeniero y Supervisor solo ven sus proyectos asignados y funciones de campo.
  */
 const ROLE_ACCESS: Record<string, string[]> = {
   administrador: [
@@ -16,56 +19,66 @@ const ROLE_ACCESS: Record<string, string[]> = {
     '/proyectos',
     '/incidencias',
     '/reportes-diarios',
-    '/validar-reportes',
     '/galeria-evidencias',
-    '/seguimiento-obra',
-    '/usuarios',
+    '/usuarios',           // Solo administrador
     '/horarios',
     '/reporte-horas',
     '/control-horario',
     '/gastos-obra',
     '/dias-no-laborales',
-    '/actividad-reciente',
-    '/catalogos',
-    '/comercial',
+    '/catalogos',          // materiales, proveedores, clientes
+    '/comercial',          // cotizaciones, inventario, ventas, pedidos
     '/configuracion',
     '/dashboard-ejecutivo',
-    '/incidencias-criticas',
-    '/asistencia',
+    '/asistencia',         // Universal - todos los roles
   ],
   gerente: [
     '/dashboard',
     '/proyectos',
     '/incidencias',
-    '/incidencias-criticas',
     '/reportes-diarios',
-    '/validar-reportes',
     '/galeria-evidencias',
-    '/seguimiento-obra',
     '/horarios',
     '/reporte-horas',
     '/control-horario',
     '/gastos-obra',
     '/dias-no-laborales',
-    '/actividad-reciente',
-    '/catalogos',
-    '/comercial',
+    '/catalogos',          // materiales, proveedores, clientes
+    '/comercial',          // cotizaciones, inventario, ventas, pedidos
     '/dashboard-ejecutivo',
-    '/asistencia',
+    '/asistencia',         // Universal - todos los roles
   ],
-  supervisor: ['/asistencia'],
-  ingeniero: ['/asistencia'],
+  ingeniero: [
+    '/proyectos',          // Solo proyectos asignados (filtrado en frontend)
+    '/incidencias',        // Solo incidencias asignadas (filtrado en frontend)
+    '/galeria-evidencias',
+    '/asistencia',         // Universal - todos los roles
+  ],
+  supervisor: [
+    '/proyectos',          // Solo proyectos asignados (filtrado en frontend)
+    '/reportes-diarios',   // Puede crear reportes de avance
+    '/incidencias',        // Puede reportar y ver de sus proyectos (filtrado en frontend)
+    '/galeria-evidencias',
+    '/asistencia',         // Universal - todos los roles
+  ],
 };
 
 /**
- * Extrae el rol del usuario desde el nombre del token almacenado en cookie.
- * El token es opaco para el middleware (es un token Sanctum del servidor),
- * por lo que dependemos de una cookie auxiliar `auth_role` para el rol.
+ * Extrae el rol del usuario desde la cookie auxiliar `auth_role`.
+ * El token Sanctum es opaco para el middleware, por eso usamos
+ * una cookie no sensible con el nombre del rol.
  */
 function getRolFromCookies(request: NextRequest): string | null {
   return request.cookies.get('auth_role')?.value || null;
 }
 
+/**
+ * Middleware de protección de rutas.
+ * 1. Permite rutas públicas sin verificación.
+ * 2. Sin token → redirige al login.
+ * 3. Sin rol (sesión inconsistente) → deja pasar, el cliente lo manejará.
+ * 4. Con rol pero sin acceso a la ruta → redirige a /no-autorizado.
+ */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -74,7 +87,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Obtener token de autenticación
+  // Obtener token de autenticación desde cookie
   const token = request.cookies.get('auth_token')?.value;
 
   // Sin token → redirigir al login
@@ -85,9 +98,9 @@ export function proxy(request: NextRequest) {
   // Obtener rol del usuario desde cookie auxiliar
   const rol = getRolFromCookies(request);
 
-  // Si hay token pero no hay rol (sesión inconsistente), limpiar y redirigir
+  // Si hay token pero no hay rol (sesión inconsistente),
+  // dejar pasar — el componente cliente manejará esto via initAuth()
   if (!rol) {
-    // Permitir paso — el componente cliente manejará esto via initAuth()
     return NextResponse.next();
   }
 
@@ -95,6 +108,7 @@ export function proxy(request: NextRequest) {
   const allowedPaths = ROLE_ACCESS[rol] || [];
   const hasAccess = allowedPaths.some(p => pathname.startsWith(p));
 
+  // Ruta no permitida para el rol → redirigir a /no-autorizado
   if (!hasAccess) {
     return NextResponse.redirect(new URL('/no-autorizado', request.url));
   }
