@@ -11,7 +11,7 @@ import {
   AlertTriangle, Calendar, Settings, ChevronLeft, ChevronRight,
   Building2, ClipboardList, ShieldAlert, FileCheck,
   ShoppingCart, BarChart3, Boxes, LogOut, ShieldCheck,
-  UserCircle, Timer, Briefcase, CalendarCheck, Hammer,
+  UserCircle, Timer, Briefcase, CalendarCheck, Hammer, X,
 } from 'lucide-react';
 import type { AuthRole } from '@/types';
 
@@ -199,7 +199,7 @@ const roleLabels: Record<string, string> = {
 };
 
 export default function Sidebar() {
-  const { sidebarCollapsed, toggleSidebar } = useStore();
+  const { sidebarCollapsed, toggleSidebar, mobileSidebarOpen, setMobileSidebarOpen } = useStore();
   const { currentUser, logout } = useAuthStore();
   const pathname = usePathname();
   const router = useRouter();
@@ -231,23 +231,40 @@ export default function Sidebar() {
   };
 
   return (
-    <aside
-      className={cn(
-        'fixed left-0 top-0 h-screen bg-sidebar border-r border-default z-40 flex flex-col transition-all duration-300 ease-in-out',
-        sidebarCollapsed ? 'w-[72px]' : 'w-[260px]'
+    <>
+      {/* Backdrop móvil */}
+      {mobileSidebarOpen && (
+        <div
+          onClick={() => setMobileSidebarOpen(false)}
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+        />
       )}
-    >
+
+      <aside
+        className={cn(
+          'fixed left-0 top-0 h-screen w-[260px] bg-sidebar border-r border-default z-40 flex flex-col transition-transform lg:transition-[width] duration-300 ease-in-out',
+          sidebarCollapsed ? 'lg:w-[72px]' : 'lg:w-[260px]',
+          mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full',
+          'lg:translate-x-0'
+        )}
+      >
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 h-16 border-b border-default shrink-0">
         <div className="w-9 h-9 rounded-xl gradient-brand flex items-center justify-center shrink-0">
           <Building2 size={20} className="text-white" />
         </div>
         {!sidebarCollapsed && (
-          <div className="overflow-hidden">
+          <div className="overflow-hidden flex-1">
             <p className="text-sm font-bold text-primary leading-none">SIGO</p>
             <p className="text-xs text-muted mt-0.5">Centro de Control</p>
           </div>
         )}
+        <button
+          onClick={() => setMobileSidebarOpen(false)}
+          className="lg:hidden p-1.5 rounded-lg text-secondary hover:text-primary hover:bg-app transition-colors ml-auto"
+        >
+          <X size={18} />
+        </button>
       </div>
 
       {/* Badge del usuario con rol */}
@@ -294,6 +311,7 @@ export default function Sidebar() {
                   key={item.href}
                   href={item.href}
                   title={sidebarCollapsed ? item.label : undefined}
+                  onClick={() => setMobileSidebarOpen(false)}
                   className={cn(
                     'sidebar-item mb-0.5',
                     active && 'active',
@@ -329,7 +347,7 @@ export default function Sidebar() {
         </button>
         <button
           onClick={toggleSidebar}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 border-t border-default text-secondary hover:text-primary hover:bg-app transition-colors text-xs"
+          className="hidden lg:flex w-full items-center justify-center gap-2 px-4 py-3 border-t border-default text-secondary hover:text-primary hover:bg-app transition-colors text-xs"
         >
           {sidebarCollapsed ? <ChevronRight size={16} /> : (
             <>
@@ -339,6 +357,7 @@ export default function Sidebar() {
           )}
         </button>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }

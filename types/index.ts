@@ -1,6 +1,11 @@
 // ─── Auth ────────────────────────────────────────────────────────────────────
 export type AuthRole = 'administrador' | 'gerente' | 'supervisor' | 'ingeniero';
 
+export interface EmpresaResumen {
+  id: number;
+  nombre: string;
+}
+
 export interface AuthUser {
   id: number;
   nombre: string;
@@ -12,6 +17,8 @@ export interface AuthUser {
     nombre: AuthRole;
   };
   proyectos?: any[];
+  empresa_actual?: EmpresaResumen | null;
+  empresas_disponibles?: EmpresaResumen[];
 }
 
 // ─── Existing Roles ───────────────────────────────────────────────────────────

@@ -11,9 +11,13 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, leftIcon, className, ...props }, ref) => (
+  ({ label, error, leftIcon, required, className, ...props }, ref) => (
     <div className="flex flex-col gap-1">
-      {label && <label className="text-xs font-medium text-secondary">{label}</label>}
+      {label && (
+        <label className="text-xs font-medium text-secondary">
+          {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+        </label>
+      )}
       <div className="relative">
         {leftIcon && (
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted">{leftIcon}</div>

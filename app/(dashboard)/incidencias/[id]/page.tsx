@@ -265,7 +265,7 @@ export default function IncidenciaDetallePage() {
               </span>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-2 shrink-0">
+          <div className="flex flex-col items-start md:items-end gap-2 shrink-0">
             <Badge variant={estadoIncVariant(estado)} size="md">{estado}</Badge>
             <p className="text-[10px] text-muted">Actualizada: {timeAgo(fechaUpdate)}</p>
           </div>

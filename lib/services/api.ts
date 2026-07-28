@@ -45,6 +45,30 @@ export const api = {
   },
 };
 
+export function extractErrorMessage(err: unknown, fallback = 'Ocurrió un error inesperado'): string {
+  if (err instanceof ApiError) {
+    const errors = err.data?.errors as Record<string, string[]> | undefined;
+    if (errors) {
+      const messages = Object.values(errors).flat().filter(Boolean);
+      if (messages.length > 0) return messages.join(' ');
+    }
+    return err.message || fallback;
+  }
+  if (err instanceof Error && err.message) return err.message;
+  return fallback;
+}
+
+export function extractFieldErrors(err: unknown): Record<string, string> {
+  if (err instanceof ApiError && err.data?.errors) {
+    const out: Record<string, string> = {};
+    Object.entries(err.data.errors as Record<string, string[]>).forEach(([field, msgs]) => {
+      if (msgs?.[0]) out[field] = msgs[0];
+    });
+    return out;
+  }
+  return {};
+}
+
 async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
   const url = `${API_URL}${endpoint}`;
   const headers = new Headers(options.headers || {});

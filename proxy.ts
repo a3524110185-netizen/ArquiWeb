@@ -52,6 +52,7 @@ const ROLE_ACCESS: Record<string, string[]> = {
     '/proyectos',          // Solo proyectos asignados (filtrado en frontend)
     '/incidencias',        // Solo incidencias asignadas (filtrado en frontend)
     '/galeria-evidencias',
+    '/reporte-horas',      // Solo sus propias horas (filtrado en frontend)
     '/asistencia',         // Universal - todos los roles
   ],
   supervisor: [
@@ -59,6 +60,7 @@ const ROLE_ACCESS: Record<string, string[]> = {
     '/reportes-diarios',   // Puede crear reportes de avance
     '/incidencias',        // Puede reportar y ver de sus proyectos (filtrado en frontend)
     '/galeria-evidencias',
+    '/reporte-horas',      // Solo sus propias horas (filtrado en frontend)
     '/asistencia',         // Universal - todos los roles
   ],
 };

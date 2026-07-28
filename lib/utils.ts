@@ -49,3 +49,13 @@ export function timeAgo(dateStr: string): string {
 export function getInitials(name: string): string {
   return name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
 }
+
+export function toISODate(date: Date): string {
+  return date.toISOString().split('T')[0];
+}
+
+export function getDefaultDateRange(): { desde: string; hasta: string } {
+  const hoy = new Date();
+  const primerDia = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  return { desde: toISODate(primerDia), hasta: toISODate(hoy) };
+}

@@ -28,7 +28,7 @@ export default function Card({ className, hover, gradient, padding = 'md', child
 
 export function CardHeader({ className, children, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn('flex items-center justify-between mb-4', className)} {...props}>
+    <div className={cn('flex flex-wrap items-center justify-between gap-2 mb-4', className)} {...props}>
       {children}
     </div>
   );

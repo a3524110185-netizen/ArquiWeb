@@ -221,7 +221,7 @@ export default function IncidenciasPage() {
         </div>
 
         <select
-          className="bg-card text-primary border border-default rounded-lg px-3 py-2 text-xs"
+          className="bg-card text-primary border border-default rounded-lg px-3 py-2 text-xs w-full sm:w-auto"
           value={selectedSeveridad}
           onChange={e => setSelectedSeveridad(e.target.value)}
         >
@@ -233,7 +233,7 @@ export default function IncidenciasPage() {
         </select>
 
         <select
-          className="bg-card text-primary border border-default rounded-lg px-3 py-2 text-xs max-w-xs"
+          className="bg-card text-primary border border-default rounded-lg px-3 py-2 text-xs w-full sm:w-auto sm:max-w-xs"
           value={selectedProyectoId}
           onChange={e => setSelectedProyectoId(e.target.value)}
         >
@@ -264,7 +264,7 @@ export default function IncidenciasPage() {
             ? Array.from({ length: 6 }).map((_, i) => <CardSkeleton key={i} />)
             : filtered.length === 0
               ? (
-                <div className="col-span-3 py-16 text-center space-y-3">
+                <div className="col-span-full py-16 text-center space-y-3">
                   <InboxIcon size={40} className="text-muted mx-auto" />
                   <p className="text-sm font-medium text-secondary">No hay incidencias para mostrar</p>
                   {(activeTab || search || selectedSeveridad || selectedProyectoId) && (

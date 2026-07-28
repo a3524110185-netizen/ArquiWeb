@@ -2,7 +2,8 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { useStore } from '@/store/useStore';
 import { useAuthStore } from '@/store/useAuthStore';
-import { Bell, Sun, Moon, LogOut } from 'lucide-react';
+import EmpresaSelector from '@/components/layout/EmpresaSelector';
+import { Bell, Sun, Moon, LogOut, Menu } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { timeAgo } from '@/lib/utils';
 import { cn } from '@/lib/utils';
@@ -39,7 +40,7 @@ const pageTitles: Record<string, string> = {
 };
 
 export default function Header() {
-  const { darkMode, toggleDarkMode, notificaciones, marcarNotificacionLeida, sidebarCollapsed } = useStore();
+  const { darkMode, toggleDarkMode, notificaciones, marcarNotificacionLeida, sidebarCollapsed, toggleMobileSidebar } = useStore();
   const { currentUser, logout } = useAuthStore();
   const pathname = usePathname();
   const router = useRouter();
@@ -85,19 +86,18 @@ export default function Header() {
 
   return (
     <header className={cn(
-      'fixed top-0 right-0 h-16 bg-card border-b border-default z-30 flex items-center px-4 gap-4 transition-all duration-300 ease-in-out',
-      sidebarCollapsed ? 'left-[72px]' : 'left-[260px]'
+      'fixed top-0 right-0 left-0 h-16 bg-card border-b border-default z-30 flex items-center px-4 gap-4 transition-all duration-300 ease-in-out',
+      sidebarCollapsed ? 'lg:left-[72px]' : 'lg:left-[260px]'
     )}>
+      <button
+        onClick={toggleMobileSidebar}
+        className="lg:hidden p-2 rounded-lg text-secondary hover:text-primary hover:bg-app transition-colors shrink-0"
+      >
+        <Menu size={20} />
+      </button>
       <h1 className="flex-1 text-base font-semibold text-primary truncate">{title}</h1>
 
       <div className="flex items-center gap-2">
-        {/* Company badge */}
-        {(currentUser as any)?.empresaNombre && (
-          <span className="hidden md:inline-flex items-center px-2.5 py-1 rounded-lg bg-app border border-default text-xs text-secondary font-medium">
-            {(currentUser as any).empresaNombre}
-          </span>
-        )}
-
         {/* Dark Mode */}
         <button
           id="dark-mode-toggle"
@@ -172,6 +172,7 @@ export default function Header() {
             <p className="text-xs font-semibold text-primary leading-none">{currentUser?.nombre || 'Usuario'}</p>
             <p className="text-[10px] text-muted mt-0.5 capitalize">{currentUser?.rol?.nombre}</p>
           </div>
+          <EmpresaSelector />
           <button
             onClick={handleLogout}
             className="ml-1 p-1.5 rounded-lg text-secondary hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"

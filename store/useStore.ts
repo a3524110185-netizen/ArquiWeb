@@ -571,11 +571,14 @@ interface AppState {
 
   // UI State
   sidebarCollapsed: boolean;
+  mobileSidebarOpen: boolean;
   darkMode: boolean;
 
   // Actions
   setSidebarCollapsed: (v: boolean) => void;
   toggleSidebar: () => void;
+  setMobileSidebarOpen: (v: boolean) => void;
+  toggleMobileSidebar: () => void;
   toggleDarkMode: () => void;
 
   // CRUD Empresas
@@ -673,10 +676,13 @@ export const useStore = create<AppState>((set) => ({
   ventas: ventasMock,
 
   sidebarCollapsed: false,
+  mobileSidebarOpen: false,
   darkMode: false,
 
   setSidebarCollapsed: (v) => set({ sidebarCollapsed: v }),
   toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
+  setMobileSidebarOpen: (v) => set({ mobileSidebarOpen: v }),
+  toggleMobileSidebar: () => set((s) => ({ mobileSidebarOpen: !s.mobileSidebarOpen })),
   toggleDarkMode: () => set((s) => {
     const next = !s.darkMode;
     if (typeof document !== 'undefined') {

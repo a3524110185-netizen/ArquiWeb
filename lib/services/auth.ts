@@ -1,5 +1,5 @@
 import { api } from './api';
-import type { AuthUser } from '@/types';
+import type { AuthUser, EmpresaResumen } from '@/types';
 
 export const authService = {
   async login(email: string, password: string) {
@@ -16,5 +16,9 @@ export const authService = {
 
   async getUsuario() {
     return api.get<AuthUser | { usuario: AuthUser }>('/auth/me');
+  },
+
+  async cambiarEmpresa(empresaId: number) {
+    return api.put<{ empresa: EmpresaResumen }>('/auth/cambiar-empresa', { empresa_id: empresaId });
   },
 };

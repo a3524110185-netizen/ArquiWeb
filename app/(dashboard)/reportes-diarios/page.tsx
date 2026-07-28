@@ -266,7 +266,7 @@ export default function ReportesDiariosPage() {
       {selectedProyecto ? (
         <>
           {/* KPIs */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="bg-card rounded-2xl p-5 border border-default shadow-sm flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-brand-50 dark:bg-brand-900/20 flex items-center justify-center shrink-0">
                 <FileText size={20} className="text-brand-600 dark:text-brand-400" />
@@ -337,7 +337,7 @@ export default function ReportesDiariosPage() {
             </div>
 
             {/* Rango de Fechas */}
-            <div className="flex items-center gap-2 pr-2">
+            <div className="flex flex-wrap items-center gap-2 pr-2">
               <div className="flex items-center bg-app border border-default rounded-xl px-3 py-1.5">
                 <Calendar size={14} className="text-muted mr-2" />
                 <input
@@ -393,7 +393,7 @@ export default function ReportesDiariosPage() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm whitespace-nowrap">
+                <table className="w-full text-left text-sm">
                   <thead className="bg-app border-b border-default text-muted">
                     <tr>
                       <th className="px-5 py-4 font-semibold text-xs uppercase tracking-wider">Fecha</th>

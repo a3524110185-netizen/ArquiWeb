@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
+import EmpresaModal from '@/components/layout/EmpresaModal';
 import { useStore } from '@/store/useStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { cn } from '@/lib/utils';
@@ -48,11 +49,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen bg-app">
+      <EmpresaModal />
       <Sidebar />
       <div
         className={cn(
           'transition-all duration-300 ease-in-out',
-          sidebarCollapsed ? 'pl-[72px]' : 'pl-[260px]'
+          sidebarCollapsed ? 'lg:pl-[72px]' : 'lg:pl-[260px]'
         )}
       >
         <Header />

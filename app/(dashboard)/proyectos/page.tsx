@@ -148,8 +148,8 @@ export default function ProyectosPage() {
                   <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/3" />
                   <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
                 </div>
-                <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded-full w-20 shrink-0" />
-                <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-24 shrink-0" />
+                <div className="hidden sm:block h-6 bg-slate-200 dark:bg-slate-700 rounded-full w-20 shrink-0" />
+                <div className="hidden sm:block h-4 bg-slate-200 dark:bg-slate-700 rounded w-24 shrink-0" />
               </div>
             ))}
           </div>

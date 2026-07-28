@@ -355,7 +355,7 @@ export default function EditarProyectoPage() {
             <label className="block text-xs font-semibold text-secondary mb-1.5">
               Imagen de Portada
             </label>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
               {imagePreview && (
                 <img
                   src={imagePreview}
@@ -363,7 +363,7 @@ export default function EditarProyectoPage() {
                   className="w-20 h-20 rounded-xl object-cover border border-default shrink-0"
                 />
               )}
-              <label className="flex-1 border-2 border-dashed border-default hover:border-brand-500 rounded-xl p-4 text-center cursor-pointer transition-colors bg-app">
+              <label className="w-full sm:flex-1 border-2 border-dashed border-default hover:border-brand-500 rounded-xl p-4 text-center cursor-pointer transition-colors bg-app">
                 <Upload size={20} className="mx-auto text-muted mb-1" />
                 <span className="text-xs font-medium text-secondary block">
                   {imagenPortada ? imagenPortada.name : 'Cambiar imagen de portada'}

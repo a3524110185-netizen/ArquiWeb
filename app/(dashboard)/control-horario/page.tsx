@@ -1,147 +1,181 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { useStore } from '@/store/useStore';
-import Card, { CardHeader, CardTitle } from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
-import Badge from '@/components/ui/Badge';
-import { formatDate } from '@/lib/utils';
-import { Clock, Search, Calendar as CalendarIcon, User } from 'lucide-react';
-import { useToast } from '@/components/ui/Toast';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useAuthStore } from '@/store/useAuthStore';
+import { rhService, ControlHorarioRegistro } from '@/lib/services/rh';
+import { usuariosService, UsuarioApi } from '@/lib/services/usuarios';
+import { proyectosService, ProyectoApi } from '@/lib/services/proyectos';
+import { extractErrorMessage, extractFieldErrors } from '@/lib/services/api';
+import Card from '@/components/ui/Card';
+import Badge, { BadgeVariant } from '@/components/ui/Badge';
+import { Select } from '@/components/ui/FormFields';
+import Pagination, { usePagination } from '@/components/ui/Pagination';
+import { formatDate, getDefaultDateRange } from '@/lib/utils';
+import { Clock, Loader2, AlertCircle, Search } from 'lucide-react';
+
+const PER_PAGE = 10;
+
+const ESTADO_OPTIONS = [
+  { value: 'todos', label: 'Todos los estados' },
+  { value: 'completo', label: 'Completo' },
+  { value: 'incompleto', label: 'Incompleto' },
+  { value: 'falta', label: 'Falta' },
+];
+
+const estadoVariant: Record<string, BadgeVariant> = {
+  completo: 'success', incompleto: 'warning', falta: 'danger',
+};
 
 export default function ControlHorarioPage() {
-  const { usuarios, horarios, diasNoLaborales, addRegistroHorario, updateRegistroHorario } = useStore();
-  const toast = useToast();
-  const [time, setTime] = useState(new Date());
-  const [selectedUser, setSelectedUser] = useState(usuarios[0]?.id || '');
-  const [search, setSearch] = useState('');
+  const { currentUser } = useAuthStore();
+  const userRole = currentUser?.rol?.nombre || '';
+  const canFilterUsuario = userRole === 'administrador' || userRole === 'gerente';
+
+  const [usuarios, setUsuarios] = useState<UsuarioApi[]>([]);
+  const [proyectos, setProyectos] = useState<ProyectoApi[]>([]);
+  const [registros, setRegistros] = useState<ControlHorarioRegistro[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const defaultRange = useMemo(() => getDefaultDateRange(), []);
+  const [filtroUsuario, setFiltroUsuario] = useState('');
+  const [filtroProyecto, setFiltroProyecto] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState('todos');
+  const [desde, setDesde] = useState(defaultRange.desde);
+  const [hasta, setHasta] = useState(defaultRange.hasta);
+
+  // Fijar el filtro al propio usuario para ingeniero/supervisor
+  useEffect(() => {
+    if (!canFilterUsuario && currentUser) setFiltroUsuario(String(currentUser.id));
+  }, [canFilterUsuario, currentUser]);
 
   useEffect(() => {
-    const t = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(t);
-  }, []);
+    if (canFilterUsuario) usuariosService.getUsuarios('1').then(setUsuarios).catch(() => {});
+    proyectosService.getProyectos().then(setProyectos).catch(() => {});
+  }, [canFilterUsuario]);
 
-  const hoy = new Date().toISOString().split('T')[0];
-  const esDiaNoLaboral = diasNoLaborales.some(d => d.fecha === hoy);
-  
-  const filteredUsers = usuarios.filter(u => u.nombre.toLowerCase().includes(search.toLowerCase()));
-
-  const currentUser = usuarios.find(u => u.id === selectedUser);
-  const registroHoy = horarios.find(h => h.trabajadorId === selectedUser && h.fecha === hoy);
-
-  const registrar = (accion: 'entrada' | 'inicioComida' | 'finComida' | 'salida') => {
-    if (!currentUser) return;
-    const hora = new Date().toTimeString().slice(0, 5);
-    
-    if (!registroHoy) {
-      addRegistroHorario({
-        trabajadorId: currentUser.id,
-        trabajador: currentUser.nombre,
-        fecha: hoy,
-        [accion]: hora,
-        horasNormales: 0,
-        horasExtras: 0,
-        estado: 'Incompleto'
+  const cargarRegistros = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    setFieldErrors({});
+    try {
+      const data = await rhService.getControlHorario({
+        usuario_id: filtroUsuario || undefined,
+        proyecto_id: filtroProyecto || undefined,
+        desde: desde || undefined,
+        hasta: hasta || undefined,
+        estado: filtroEstado !== 'todos' ? filtroEstado : undefined,
       });
-    } else {
-      updateRegistroHorario(registroHoy.id, { [accion]: hora });
-      
-      // Si es salida, calcular horas (simulado)
-      if (accion === 'salida' && registroHoy.entrada) {
-        updateRegistroHorario(registroHoy.id, {
-          estado: 'Completo',
-          horasNormales: 8,
-          horasExtras: esDiaNoLaboral ? 8 : 1 // Si es no laboral, todas son extras
-        });
-      }
+      setRegistros(data);
+    } catch (err: any) {
+      setError(extractErrorMessage(err, 'Error al cargar el control horario.'));
+      setFieldErrors(extractFieldErrors(err));
+    } finally {
+      setLoading(false);
     }
-    toast.success(`Registro de ${accion} exitoso`, hora);
-  };
+  }, [filtroUsuario, filtroProyecto, filtroEstado, desde, hasta]);
 
-  const getStatus = (uid: string) => {
-    const r = horarios.find(h => h.trabajadorId === uid && h.fecha === hoy);
-    if (!r) return { label: 'Ausente', variant: 'gray' };
-    if (r.estado === 'Completo') return { label: 'Completado', variant: 'success' };
-    if (r.entrada && !r.salida) return { label: 'En Turno', variant: 'info' };
-    return { label: r.estado, variant: 'warning' };
-  };
+  useEffect(() => {
+    // Esperar a que se fije el usuario para roles restringidos
+    if (!canFilterUsuario && !filtroUsuario) return;
+    cargarRegistros();
+  }, [cargarRegistros, canFilterUsuario, filtroUsuario]);
+
+  const { page, setPage, totalPages, paged, totalItems } = usePagination(registros, PER_PAGE);
 
   return (
     <div className="space-y-6">
-      {esDiaNoLaboral && (
-        <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 flex items-center gap-3">
-          <CalendarIcon className="text-amber-500" />
-          <div>
-            <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">Hoy es día no laboral</p>
-            <p className="text-xs text-amber-600 dark:text-amber-500">Los registros de tiempo se calcularán como horas extras dobles/triples según ley.</p>
+      <div>
+        <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
+          <Clock className="text-brand-600" size={26} /> Control Horario
+        </h1>
+        <p className="text-sm text-muted">Consulta de entradas, salidas y estado de asistencia por trabajador</p>
+      </div>
+
+      {/* Filtros */}
+      <Card>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          {canFilterUsuario && (
+            <Select label="Usuario" placeholder="Todos los usuarios" value={filtroUsuario}
+              onChange={e => { setFiltroUsuario(e.target.value); setPage(1); }}
+              error={fieldErrors.usuario_id}
+              options={usuarios.map(u => ({ value: String(u.id), label: u.nombre }))} />
+          )}
+          <Select label="Proyecto" placeholder="Todos los proyectos" value={filtroProyecto}
+            onChange={e => { setFiltroProyecto(e.target.value); setPage(1); }}
+            error={fieldErrors.proyecto_id}
+            options={proyectos.map(p => ({ value: String(p.id), label: p.nombre }))} />
+          <Select label="Estado" value={filtroEstado}
+            onChange={e => { setFiltroEstado(e.target.value); setPage(1); }}
+            error={fieldErrors.estado}
+            options={ESTADO_OPTIONS} />
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-secondary">Desde</label>
+            <input type="date" className="input-base" value={desde} onChange={e => { setDesde(e.target.value); setPage(1); }} />
+            {fieldErrors.desde && <p className="text-xs text-red-500">{fieldErrors.desde}</p>}
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-secondary">Hasta</label>
+            <input type="date" className="input-base" value={hasta} onChange={e => { setHasta(e.target.value); setPage(1); }} />
+            {fieldErrors.hasta && <p className="text-xs text-red-500">{fieldErrors.hasta}</p>}
           </div>
         </div>
-      )}
+      </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Panel de Registro */}
-        <Card className="lg:col-span-2 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-600 to-sky-500" />
-          <div className="text-center py-6">
-            <div className="text-6xl font-bold font-mono text-primary tracking-wider tabular-nums">
-              {time.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+      {/* Tabla */}
+      <Card padding="none" className="overflow-hidden">
+        {loading ? (
+          <div className="py-16 flex flex-col items-center justify-center gap-3">
+            <Loader2 size={28} className="animate-spin text-brand-600" />
+            <p className="text-sm text-muted">Cargando registros...</p>
+          </div>
+        ) : error ? (
+          <div className="py-12 text-center space-y-3">
+            <AlertCircle className="text-red-500 mx-auto" size={36} />
+            <p className="text-sm font-medium text-red-500">{error}</p>
+            <button onClick={cargarRegistros} className="text-sm text-brand-600 hover:underline font-medium">Reintentar</button>
+          </div>
+        ) : paged.length === 0 ? (
+          <div className="py-16 text-center flex flex-col items-center gap-2">
+            <Search className="text-muted" size={32} />
+            <p className="text-sm text-muted">No hay registros de control horario para los filtros seleccionados</p>
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-app border-b border-default">
+                  <tr>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-secondary">Usuario</th>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-secondary">Fecha</th>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-secondary">Entrada</th>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-secondary">Salida</th>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-secondary">Horas</th>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-secondary">Estado</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-default">
+                  {paged.map(r => (
+                    <tr key={r.id} className="hover:bg-app transition-colors">
+                      <td className="py-3 px-4 font-medium text-primary">{r.usuario?.nombre || usuarios.find(u => u.id === r.usuario_id)?.nombre || `Usuario ${r.usuario_id}`}</td>
+                      <td className="py-3 px-4 text-secondary">{formatDate(r.fecha)}</td>
+                      <td className="py-3 px-4 font-mono text-secondary">{r.entrada || '—'}</td>
+                      <td className="py-3 px-4 font-mono text-secondary">{r.salida || '—'}</td>
+                      <td className="py-3 px-4 font-semibold text-primary">{r.horas != null ? `${r.horas}h` : '—'}</td>
+                      <td className="py-3 px-4">
+                        <Badge variant={estadoVariant[r.estado?.toLowerCase()] || 'gray'} dot>{r.estado}</Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <p className="text-secondary mt-2">{time.toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-          </div>
-
-          <div className="border-t border-default pt-6">
-            <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-full gradient-brand text-white flex items-center justify-center font-bold text-lg shrink-0">
-                {currentUser?.avatar}
-              </div>
-              <div className="flex-1 w-full">
-                <select className="input-base text-lg font-medium" value={selectedUser} onChange={e => setSelectedUser(e.target.value)}>
-                  {usuarios.map(u => <option key={u.id} value={u.id}>{u.nombre} - {u.rol}</option>)}
-                </select>
-              </div>
+            <div className="p-4">
+              <Pagination page={page} totalPages={totalPages} onPageChange={setPage} totalItems={totalItems} itemsPerPage={PER_PAGE} />
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <Button size="lg" className="h-16 justify-center text-lg bg-emerald-600 hover:bg-emerald-700" onClick={() => registrar('entrada')} disabled={!!registroHoy?.entrada}>
-                Entrada {registroHoy?.entrada && <span className="font-mono text-sm ml-2 bg-black/20 px-2 py-1 rounded">{registroHoy.entrada}</span>}
-              </Button>
-              <Button size="lg" className="h-16 justify-center text-lg bg-amber-500 hover:bg-amber-600" onClick={() => registrar('inicioComida')} disabled={!registroHoy?.entrada || !!registroHoy?.inicioComida}>
-                Inicio Comida {registroHoy?.inicioComida && <span className="font-mono text-sm ml-2 bg-black/20 px-2 py-1 rounded">{registroHoy.inicioComida}</span>}
-              </Button>
-              <Button size="lg" className="h-16 justify-center text-lg bg-sky-500 hover:bg-sky-600" onClick={() => registrar('finComida')} disabled={!registroHoy?.inicioComida || !!registroHoy?.finComida}>
-                Fin Comida {registroHoy?.finComida && <span className="font-mono text-sm ml-2 bg-black/20 px-2 py-1 rounded">{registroHoy.finComida}</span>}
-              </Button>
-              <Button size="lg" className="h-16 justify-center text-lg bg-red-600 hover:bg-red-700" onClick={() => registrar('salida')} disabled={!registroHoy?.entrada || !!registroHoy?.salida}>
-                Salida {registroHoy?.salida && <span className="font-mono text-sm ml-2 bg-black/20 px-2 py-1 rounded">{registroHoy.salida}</span>}
-              </Button>
-            </div>
-          </div>
-        </Card>
-
-        {/* Status de Empleados */}
-        <Card className="flex flex-col h-full">
-          <CardHeader className="pb-4">
-            <CardTitle>Estatus de Hoy</CardTitle>
-          </CardHeader>
-          <div className="relative mb-4">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-            <input className="input-base pl-9" placeholder="Buscar empleado..." value={search} onChange={e => setSearch(e.target.value)} />
-          </div>
-          <div className="flex-1 overflow-y-auto pr-2 space-y-2 max-h-[400px] scrollbar-thin">
-            {filteredUsers.map(u => {
-              const status = getStatus(u.id);
-              return (
-                <div key={u.id} className={`flex items-center justify-between p-2.5 rounded-xl border border-default cursor-pointer transition-colors ${selectedUser === u.id ? 'bg-brand-50 border-brand-200 dark:bg-brand-900/20' : 'hover:bg-app'}`} onClick={() => setSelectedUser(u.id)}>
-                  <div className="flex items-center gap-2 min-w-0">
-                    <User size={14} className="text-secondary shrink-0" />
-                    <span className="text-xs font-medium text-primary truncate">{u.nombre}</span>
-                  </div>
-                  <Badge variant={status.variant as any} size="sm">{status.label}</Badge>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-      </div>
+          </>
+        )}
+      </Card>
     </div>
   );
 }

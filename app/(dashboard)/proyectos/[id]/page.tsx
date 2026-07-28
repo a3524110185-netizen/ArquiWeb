@@ -223,7 +223,7 @@ export default function ProyectoDetallePage() {
       {/* Banner */}
       <Card className="p-6 relative overflow-hidden">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-          <div className="flex items-start gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             {proyecto.imagen_portada ? (
               <img src={proyecto.imagen_portada} alt={proyecto.nombre}
                 className="w-20 h-20 rounded-2xl object-cover border border-default shrink-0 shadow-sm" />
@@ -232,7 +232,7 @@ export default function ProyectoDetallePage() {
                 <Building2 size={36} />
               </div>
             )}
-            <div className="space-y-1">
+            <div className="space-y-1 min-w-0">
               <div className="flex items-center gap-3 flex-wrap">
                 <span className="font-mono text-xs font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/30 px-2 py-0.5 rounded">
                   {proyecto.codigo || `PRJ-${proyecto.id}`}
