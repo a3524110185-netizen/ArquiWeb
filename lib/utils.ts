@@ -34,6 +34,14 @@ export function formatDateTime(dateStr: string): string {
   }).format(new Date(dateStr));
 }
 
+export function formatTime(dateStr: string): string {
+  if (!dateStr) return '-';
+  return new Intl.DateTimeFormat('es-MX', {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(dateStr));
+}
+
 export function timeAgo(dateStr: string): string {
   const now = new Date();
   const date = new Date(dateStr);

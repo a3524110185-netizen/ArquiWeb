@@ -150,6 +150,8 @@ export default function ControlHorarioPage() {
                     <th className="text-left py-3 px-4 text-xs font-semibold text-secondary">Fecha</th>
                     <th className="text-left py-3 px-4 text-xs font-semibold text-secondary">Entrada</th>
                     <th className="text-left py-3 px-4 text-xs font-semibold text-secondary">Salida</th>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-secondary">Inicio comida</th>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-secondary">Fin comida</th>
                     <th className="text-left py-3 px-4 text-xs font-semibold text-secondary">Horas</th>
                     <th className="text-left py-3 px-4 text-xs font-semibold text-secondary">Estado</th>
                   </tr>
@@ -161,6 +163,8 @@ export default function ControlHorarioPage() {
                       <td className="py-3 px-4 text-secondary">{formatDate(r.fecha)}</td>
                       <td className="py-3 px-4 font-mono text-secondary">{r.entrada || '—'}</td>
                       <td className="py-3 px-4 font-mono text-secondary">{r.salida || '—'}</td>
+                      <td className="py-3 px-4 font-mono text-secondary">{r.comida_inicio || '—'}</td>
+                      <td className="py-3 px-4 font-mono text-secondary">{r.comida_fin || '—'}</td>
                       <td className="py-3 px-4 font-semibold text-primary">{r.horas != null ? `${r.horas}h` : '—'}</td>
                       <td className="py-3 px-4">
                         <Badge variant={estadoVariant[r.estado?.toLowerCase()] || 'gray'} dot>{r.estado}</Badge>

@@ -5,7 +5,7 @@ import {
   Timer, LogIn, Coffee, LogOut as LogOutIcon,
   CheckCircle2, Clock, MapPin, Calendar, User,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatTime } from '@/lib/utils';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 type EstadoJornada = 'sin_registrar' | 'en_jornada' | 'en_comida' | 'finalizada';
@@ -118,7 +118,15 @@ export default function AsistenciaPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setRegistro(data.data || { estado: 'sin_registrar' });
+        const r = data.data;
+        setRegistro(r ? {
+          estado: r.estado || 'sin_registrar',
+          entrada: r.entrada,
+          inicio_comida: r.comida_inicio ? formatTime(r.comida_inicio) : undefined,
+          fin_comida: r.comida_fin ? formatTime(r.comida_fin) : undefined,
+          salida: r.salida,
+          horas_trabajadas: r.horas_trabajadas,
+        } : { estado: 'sin_registrar' });
       } else {
         setRegistro({ estado: 'sin_registrar' });
       }

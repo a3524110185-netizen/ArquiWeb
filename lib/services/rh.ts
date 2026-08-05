@@ -1,4 +1,5 @@
 import { api } from './api';
+import { DIA_SEMANA_A_NUMERO, NUMERO_A_DIA_SEMANA } from '../constants/dias';
 
 function extractArray<T>(data: any, keys: string[] = []): T[] {
   if (!data) return [];
@@ -28,23 +29,37 @@ export interface HorarioApi {
   hora_fin: string | null;
 }
 
+// La API representa dia_semana como entero 1-7; internamente la app lo maneja
+// como string ('lunes'...'domingo') porque se usa como key de un Record<DiaSemana, HorarioApi>.
+function normalizarHorario(h: any): HorarioApi {
+  const dia = typeof h.dia_semana === 'number' || /^\d+$/.test(String(h.dia_semana))
+    ? NUMERO_A_DIA_SEMANA[Number(h.dia_semana)]
+    : String(h.dia_semana).toLowerCase();
+  return { ...h, dia_semana: dia as DiaSemana };
+}
+
 export const rhService = {
   // GET /api/horarios
   async getHorarios(): Promise<HorarioApi[]> {
     const response = await api.get<any>('/horarios');
-    return extractArray<HorarioApi>(response.data, ['horarios']);
+    return extractArray<HorarioApi>(response.data, ['horarios']).map(normalizarHorario);
   },
 
   // POST /api/horarios
   async crearHorario(data: HorarioApi): Promise<HorarioApi> {
-    const response = await api.post<any>('/horarios', data);
-    return response.data?.horario || response.data;
+    const payload = { ...data, dia_semana: DIA_SEMANA_A_NUMERO[data.dia_semana] };
+    const response = await api.post<any>('/horarios', payload);
+    return normalizarHorario(response.data?.horario || response.data);
   },
 
   // PUT /api/horarios/{id}
   async actualizarHorario(id: number, data: Partial<HorarioApi>): Promise<HorarioApi> {
-    const response = await api.put<any>(`/horarios/${id}`, data);
-    return response.data?.horario || response.data;
+    const payload = {
+      ...data,
+      dia_semana: data.dia_semana ? DIA_SEMANA_A_NUMERO[data.dia_semana] : undefined,
+    };
+    const response = await api.put<any>(`/horarios/${id}`, payload);
+    return normalizarHorario(response.data?.horario || response.data);
   },
 
   // ─── Días No Laborales ─────────────────────────────────────────────────
@@ -151,6 +166,8 @@ export interface ControlHorarioRegistro {
   fecha: string;
   entrada?: string | null;
   salida?: string | null;
+  comida_inicio?: string | null;
+  comida_fin?: string | null;
   horas?: number;
   estado: 'completo' | 'incompleto' | 'falta' | string;
 }

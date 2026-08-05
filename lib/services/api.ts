@@ -43,6 +43,14 @@ export const api = {
   async delete<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
     return fetchApi<T>(endpoint, { ...options, method: 'DELETE' });
   },
+
+  async patch<T>(endpoint: string, data?: any, options?: RequestInit): Promise<ApiResponse<T>> {
+    return fetchApi<T>(endpoint, {
+      ...options,
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
 };
 
 export function extractErrorMessage(err: unknown, fallback = 'Ocurrió un error inesperado'): string {
