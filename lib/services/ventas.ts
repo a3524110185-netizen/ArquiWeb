@@ -1,5 +1,4 @@
 import { api } from './api';
-import type { CotizacionItemApi } from './cotizaciones';
 
 function extractArray<T>(data: any, keys: string[] = []): T[] {
   if (!data) return [];
@@ -12,23 +11,41 @@ function extractArray<T>(data: any, keys: string[] = []): T[] {
   return [];
 }
 
+export interface DetalleVentaApi {
+  material_id: number;
+  cantidad: number;
+  precio_unitario: number;
+  subtotal: number;
+  material?: { id: number; nombre: string; codigo?: string; unidad_medida?: string };
+}
+
 export interface VentaApi {
   id: number;
   folio: string;
   cliente_id: number;
-  cliente?: { id: number; nombre: string };
+  cliente?: { id: number; nombre: string; rfc?: string | null; telefono?: string | null; email?: string | null };
+  usuario?: { id: number; nombre: string; email?: string };
+  cotizacion?: { id: number; folio: string } | null;
   fecha: string;
   subtotal?: number;
   iva?: number;
   total: number;
+  metodo_pago?: string;
   estado?: string;
-  items?: CotizacionItemApi[];
+  observaciones?: string | null;
+  detalles?: DetalleVentaApi[];
   created_at?: string;
 }
 
 export interface VentaFormInput {
   cliente_id: number | string;
   items: { material_id?: number | null; descripcion: string; cantidad: number; precio_unitario: number }[];
+}
+
+export interface VentaDirectaFormInput {
+  cliente_id: number | string;
+  metodo_pago: string;
+  detalles: { material_id: number; cantidad: number; precio_unitario: number }[];
 }
 
 export interface VentaFiltros {
@@ -57,9 +74,15 @@ export const ventasService = {
     return response.data?.venta || response.data;
   },
 
-  // POST /api/ventas (venta directa)
+  // POST /api/ventas (a partir de una cotización convertida)
   async crearVenta(data: VentaFormInput): Promise<VentaApi> {
     const response = await api.post<any>('/ventas', data);
+    return response.data?.venta || response.data;
+  },
+
+  // POST /api/ventas/venta-directa
+  async crearVentaDirecta(data: VentaDirectaFormInput): Promise<VentaApi> {
+    const response = await api.post<any>('/ventas/venta-directa', data);
     return response.data?.venta || response.data;
   },
 };

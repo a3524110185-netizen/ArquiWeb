@@ -80,12 +80,12 @@ export default function ReporteHorasPage() {
   }), { horas: 0, extra: 0, faltas: 0 }), [resumen]);
 
   const toggleDesglose = async (row: ReporteHorasUsuario) => {
-    const uid = row.usuario_id;
+    const uid = row.usuario.id;
     if (expandedId === uid) { setExpandedId(null); return; }
     setExpandedId(uid);
     if (detalleCache[uid]) return;
-    if (row.detalle && row.detalle.length > 0) {
-      setDetalleCache(prev => ({ ...prev, [uid]: row.detalle! }));
+    if (row.dias && row.dias.length > 0) {
+      setDetalleCache(prev => ({ ...prev, [uid]: row.dias }));
       return;
     }
     setDetalleLoading(uid);
@@ -93,10 +93,7 @@ export default function ReporteHorasPage() {
       const data = await rhService.getReporteHoras({
         usuario_id: uid, proyecto_id: filtroProyecto || undefined, desde: desde || undefined, hasta: hasta || undefined,
       });
-      let detalle: ReporteHorasDia[] = [];
-      if (data.length === 1 && data[0].detalle) detalle = data[0].detalle;
-      else if (data.length > 0 && (data[0] as any).fecha) detalle = data as unknown as ReporteHorasDia[];
-      setDetalleCache(prev => ({ ...prev, [uid]: detalle }));
+      setDetalleCache(prev => ({ ...prev, [uid]: data[0]?.dias || [] }));
     } catch (err: any) {
       toast.error('Error', extractErrorMessage(err, 'No se pudo cargar el desglose diario'));
       setExpandedId(null);
@@ -153,11 +150,11 @@ export default function ReporteHorasPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-card rounded-2xl p-5 border border-default shadow-sm">
           <p className="text-xs font-medium text-muted uppercase tracking-wider mb-1">Total Horas</p>
-          <p className="text-2xl font-bold text-primary">{totales.horas.toFixed(1)}h</p>
+          <p className="text-2xl font-bold text-primary">{totales.horas.toFixed(2)}h</p>
         </div>
         <div className="bg-card rounded-2xl p-5 border border-default shadow-sm">
           <p className="text-xs font-medium text-muted uppercase tracking-wider mb-1">Horas Extra</p>
-          <p className="text-2xl font-bold text-amber-500">{totales.extra.toFixed(1)}h</p>
+          <p className="text-2xl font-bold text-amber-500">{totales.extra.toFixed(2)}h</p>
         </div>
         <div className="bg-card rounded-2xl p-5 border border-default shadow-sm">
           <p className="text-xs font-medium text-muted uppercase tracking-wider mb-1">Faltas</p>
@@ -197,17 +194,17 @@ export default function ReporteHorasPage() {
               </thead>
               <tbody className="divide-y divide-default">
                 {resumen.map(row => {
-                  const isExpanded = expandedId === row.usuario_id;
-                  const nombre = row.usuario?.nombre || usuarios.find(u => u.id === row.usuario_id)?.nombre || currentUser?.nombre || `Usuario ${row.usuario_id}`;
+                  const isExpanded = expandedId === row.usuario.id;
+                  const nombre = row.usuario?.nombre || usuarios.find(u => u.id === row.usuario.id)?.nombre || currentUser?.nombre || `Usuario ${row.usuario.id}`;
                   return (
-                    <React.Fragment key={row.usuario_id}>
+                    <React.Fragment key={row.usuario.id}>
                       <tr onClick={() => toggleDesglose(row)} className="cursor-pointer hover:bg-app transition-colors">
                         <td className="py-3 px-4 text-muted">
                           {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                         </td>
                         <td className="py-3 px-4 font-medium text-primary">{nombre}</td>
-                        <td className="py-3 px-4 font-semibold text-primary">{(row.total_horas || 0).toFixed(1)}h</td>
-                        <td className="py-3 px-4 font-semibold text-amber-500">{(row.horas_extra || 0).toFixed(1)}h</td>
+                        <td className="py-3 px-4 font-semibold text-primary">{(row.total_horas || 0).toFixed(2)}h</td>
+                        <td className="py-3 px-4 font-semibold text-amber-500">{(row.horas_extra || 0).toFixed(2)}h</td>
                         <td className="py-3 px-4">
                           <Badge variant={row.faltas > 0 ? 'danger' : 'success'}>{row.faltas}</Badge>
                         </td>
@@ -215,7 +212,7 @@ export default function ReporteHorasPage() {
                       {isExpanded && (
                         <tr>
                           <td colSpan={5} className="p-0 bg-app/50 border-b-2 border-brand-100 dark:border-brand-900/40">
-                            {detalleLoading === row.usuario_id ? (
+                            {detalleLoading === row.usuario.id ? (
                               <div className="py-8 flex justify-center"><Loader2 size={20} className="animate-spin text-brand-600" /></div>
                             ) : (
                               <div className="p-4 overflow-x-auto">
@@ -231,7 +228,7 @@ export default function ReporteHorasPage() {
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {(detalleCache[row.usuario_id] || []).map((d, idx) => (
+                                    {(detalleCache[row.usuario.id] || []).map((d, idx) => (
                                       <tr key={idx} className="border-t border-default/50">
                                         <td className="py-2 px-3 text-secondary">{formatDate(d.fecha)}</td>
                                         <td className="py-2 px-3 font-mono text-secondary">{d.entrada || '—'}</td>
@@ -243,7 +240,7 @@ export default function ReporteHorasPage() {
                                         </td>
                                       </tr>
                                     ))}
-                                    {(detalleCache[row.usuario_id] || []).length === 0 && (
+                                    {(detalleCache[row.usuario.id] || []).length === 0 && (
                                       <tr><td colSpan={6} className="py-4 text-center text-muted">Sin desglose diario disponible</td></tr>
                                     )}
                                   </tbody>

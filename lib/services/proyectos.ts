@@ -16,11 +16,13 @@ export interface ReporteApi {
   categoria: string;
   avance: number;
   descripcion: string;
-  validado: boolean;
+  validado: boolean | null;
+  validado_por?: number | null;
   notas_validacion?: string | null;
   validado_el?: string | null;
-  validador?: { id: number; nombre: string } | null;
-  usuario: { id: number; nombre: string };
+  validador?: { id: number; nombre: string; email?: string } | null;
+  estado?: 'pendiente' | 'aprobado' | 'rechazado';
+  usuario: { id: number; nombre: string; email?: string; telefono?: string };
   fotos: FotoReporte[];
   fotos_count: number;
   created_at: string;

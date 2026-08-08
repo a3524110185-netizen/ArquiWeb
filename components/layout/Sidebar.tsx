@@ -34,6 +34,7 @@ const administradorNav: NavGroup[] = [
     title: 'Principal',
     items: [
       { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+      { label: 'Dashboard Ejecutivo', href: '/dashboard-ejecutivo', icon: TrendingUp },
       { label: 'Proyectos', href: '/proyectos', icon: FolderOpen },
       { label: 'Incidencias', href: '/incidencias', icon: AlertTriangle },
       { label: 'Reportes Diarios', href: '/reportes-diarios', icon: FileText },
@@ -93,6 +94,7 @@ const gerenteNav: NavGroup[] = [
     title: 'Principal',
     items: [
       { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+      { label: 'Dashboard Ejecutivo', href: '/dashboard-ejecutivo', icon: TrendingUp },
       { label: 'Proyectos', href: '/proyectos', icon: FolderOpen },
       { label: 'Incidencias', href: '/incidencias', icon: AlertTriangle },
       { label: 'Reportes Diarios', href: '/reportes-diarios', icon: FileText },

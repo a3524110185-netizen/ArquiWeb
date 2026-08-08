@@ -27,7 +27,7 @@ const tipoIcon: Record<TipoMovimiento, typeof ArrowDownCircle> = {
   entrada: ArrowDownCircle, salida: ArrowUpCircle, ajuste: RefreshCcw,
 };
 
-const emptyForm = { material_id: '', tipo: 'entrada' as TipoMovimiento, cantidad: '', motivo: '' };
+const emptyForm = { material_id: '', tipo_movimiento: 'entrada' as TipoMovimiento, cantidad: '', motivo: '' };
 
 export default function InventarioPage() {
   const { currentUser } = useAuthStore();
@@ -196,13 +196,13 @@ export default function InventarioPage() {
               </thead>
               <tbody>
                 {historial.map(mov => {
-                  const Icon = tipoIcon[mov.tipo];
+                  const Icon = tipoIcon[mov.tipo] || RefreshCcw;
                   return (
                     <tr key={mov.id} className="border-b border-default last:border-0 hover:bg-app transition-colors">
                       <td className="py-3 pl-0 px-3 text-xs text-secondary">{formatDateTime(mov.created_at)}</td>
                       <td className="py-3 px-3 text-xs font-medium text-primary">{mov.material?.nombre || `Material #${mov.material_id}`}</td>
                       <td className="py-3 px-3">
-                        <Badge variant={tipoVariant[mov.tipo]}><Icon size={11} /> {TIPO_OPTIONS.find(t => t.value === mov.tipo)?.label || mov.tipo}</Badge>
+                        <Badge variant={tipoVariant[mov.tipo] || 'gray'}><Icon size={11} /> {TIPO_OPTIONS.find(t => t.value === mov.tipo)?.label || mov.tipo}</Badge>
                       </td>
                       <td className="py-3 px-3 text-xs font-semibold text-primary">{mov.cantidad}</td>
                       <td className="py-3 px-3 text-xs text-secondary">{mov.usuario?.nombre || '—'}</td>
@@ -227,7 +227,7 @@ export default function InventarioPage() {
           <Select label="Material" placeholder="Selecciona un material" value={form.material_id}
             onChange={e => f('material_id', e.target.value)} error={errors.material_id}
             options={materiales.map(m => ({ value: String(m.id), label: `${m.codigo} — ${m.nombre}` }))} />
-          <Select label="Tipo de movimiento" value={form.tipo} onChange={e => f('tipo', e.target.value)}
+          <Select label="Tipo de movimiento" value={form.tipo_movimiento} onChange={e => f('tipo_movimiento', e.target.value)}
             options={TIPO_OPTIONS} />
           <div>
             <label className="text-xs font-medium text-secondary mb-1 block">Cantidad</label>

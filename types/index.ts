@@ -42,8 +42,6 @@ export type IncidenciaEstado = 'Abierto' | 'En Progreso' | 'Resuelto' | 'Cerrado
 
 export type ReporteEstado = 'Pendiente' | 'Aprobado' | 'Rechazado';
 
-export type GastoCategoria = 'Materiales' | 'Mano de obra' | 'Equipo' | 'Transporte' | 'Otros';
-
 export type Turno = 'Matutino' | 'Vespertino' | 'Nocturno';
 
 export type PlanLicencia = 'Básico' | 'Profesional' | 'Empresarial';
@@ -174,18 +172,6 @@ export interface ReporteDiario {
   observaciones?: string;
 }
 
-// ─── Gasto ───────────────────────────────────────────────────────────────────
-export interface Gasto {
-  id: string;
-  proyecto: string;
-  proyectoId: string;
-  categoria: GastoCategoria;
-  monto: number;
-  fecha: string;
-  descripcion: string;
-  comprobante?: string;
-  capturista: string;
-}
 
 // ─── Registro Horario ─────────────────────────────────────────────────────────
 export interface RegistroHorario {

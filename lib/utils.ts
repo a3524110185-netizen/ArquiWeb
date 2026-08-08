@@ -14,13 +14,20 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+// Un string "YYYY-MM-DD" (sin hora) lo interpreta el motor JS como medianoche UTC;
+// al formatear en una zona horaria detrás de UTC eso corre la fecha un día hacia atrás.
+// Forzamos T00:00:00 (sin offset) para que se interprete en hora local.
+function parseFecha(dateStr: string): Date {
+  return /^\d{4}-\d{2}-\d{2}$/.test(dateStr) ? new Date(`${dateStr}T00:00:00`) : new Date(dateStr);
+}
+
 export function formatDate(dateStr: string): string {
   if (!dateStr) return '-';
   return new Intl.DateTimeFormat('es-MX', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
-  }).format(new Date(dateStr));
+  }).format(parseFecha(dateStr));
 }
 
 export function formatDateTime(dateStr: string): string {
@@ -31,7 +38,7 @@ export function formatDateTime(dateStr: string): string {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-  }).format(new Date(dateStr));
+  }).format(parseFecha(dateStr));
 }
 
 export function formatTime(dateStr: string): string {

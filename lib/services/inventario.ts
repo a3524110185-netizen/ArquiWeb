@@ -28,7 +28,7 @@ export interface MovimientoInventarioApi {
 
 export interface MovimientoFormInput {
   material_id: number | string;
-  tipo: TipoMovimiento;
+  tipo_movimiento: TipoMovimiento;
   cantidad: number | string;
   motivo?: string;
 }

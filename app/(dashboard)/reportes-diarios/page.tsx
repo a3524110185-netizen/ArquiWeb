@@ -26,6 +26,14 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// La API expone 'estado' como fuente de verdad; 'validado' solo indica si ya fue
+// aprobado (true) — false cubre tanto "pendiente" como "rechazado", así que no
+// alcanza para distinguir esos dos casos por sí solo.
+function getEstadoReporte(r: Pick<ReporteApi, 'estado' | 'validado'>): 'pendiente' | 'aprobado' | 'rechazado' {
+  if (r.estado === 'pendiente' || r.estado === 'aprobado' || r.estado === 'rechazado') return r.estado;
+  return r.validado === true ? 'aprobado' : 'pendiente';
+}
+
 export default function ReportesDiariosPage() {
   const { currentUser } = useAuthStore();
   const userRole = currentUser?.rol?.nombre?.toLowerCase() || '';
@@ -107,9 +115,7 @@ export default function ReportesDiariosPage() {
   const reportesFiltrados = useMemo(() => {
     return reportes.filter((r) => {
       // Filtro Estado
-      let estadoR = 'pendiente';
-      if (r.validado === true) estadoR = 'aprobado';
-      if (r.validado === false) estadoR = 'rechazado';
+      const estadoR = getEstadoReporte(r);
 
       if (filtroEstado !== 'todos' && estadoR !== filtroEstado) {
         return false;
@@ -133,8 +139,9 @@ export default function ReportesDiariosPage() {
     let sumaAvance = 0;
     
     reportesFiltrados.forEach(r => {
-      if (r.validado === true) aprobados++;
-      else if (r.validado === null || r.validado === undefined) pendientes++;
+      const estadoR = getEstadoReporte(r);
+      if (estadoR === 'aprobado') aprobados++;
+      else if (estadoR === 'pendiente') pendientes++;
       sumaAvance += (r.avance || 0);
     });
 
@@ -153,7 +160,7 @@ export default function ReportesDiariosPage() {
     setProcesandoAprobacion(id);
     try {
       await proyectosService.validarReporte(id, 'aprobar');
-      setReportes(prev => prev.map(r => r.id === id ? { ...r, validado: true } : r));
+      setReportes(prev => prev.map(r => r.id === id ? { ...r, validado: true, estado: 'aprobado' } : r));
     } catch (err: any) {
       alert(err.message || 'Error al aprobar el reporte.');
     } finally {
@@ -171,7 +178,7 @@ export default function ReportesDiariosPage() {
     setProcesandoRechazo(true);
     try {
       await proyectosService.validarReporte(modalRechazo.reporteId, 'rechazar', motivoRechazo);
-      setReportes(prev => prev.map(r => r.id === modalRechazo.reporteId ? { ...r, validado: false, notas_validacion: motivoRechazo } : r));
+      setReportes(prev => prev.map(r => r.id === modalRechazo.reporteId ? { ...r, validado: false, estado: 'rechazado', notas_validacion: motivoRechazo } : r));
       setModalRechazo({ isOpen: false, reporteId: null });
       setMotivoRechazo('');
     } catch (err: any) {
@@ -221,7 +228,7 @@ export default function ReportesDiariosPage() {
               <ClipboardList className="text-brand-600" size={28} /> Reportes Diarios
             </h1>
             <span className="bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-400 text-xs font-bold px-2.5 py-1 rounded-full">
-              {reportes.filter(r => r.validado === null).length} Pendientes
+              {reportes.filter(r => getEstadoReporte(r) === 'pendiente').length} Pendientes
             </span>
           </div>
           <p className="text-sm text-muted">Supervisión, registro y validación de avances diarios en obra</p>
@@ -472,11 +479,11 @@ export default function ReportesDiariosPage() {
                               )}
                             </td>
                             <td className="px-5 py-4 text-center">
-                              {rep.validado === true ? (
+                              {getEstadoReporte(rep) === 'aprobado' ? (
                                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/30">
                                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Aprobado
                                 </span>
-                              ) : rep.validado === false ? (
+                              ) : getEstadoReporte(rep) === 'rechazado' ? (
                                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/30">
                                   <div className="w-1.5 h-1.5 rounded-full bg-red-500" /> Rechazado
                                 </span>
@@ -488,7 +495,7 @@ export default function ReportesDiariosPage() {
                             </td>
                             {isGerente && (
                               <td className="px-5 py-4 text-right">
-                                {rep.validado === null || rep.validado === undefined ? (
+                                {getEstadoReporte(rep) === 'pendiente' ? (
                                   <div className="flex items-center justify-end gap-2">
                                     <button
                                       onClick={(e) => handleAprobar(rep.id, e)}
@@ -527,10 +534,10 @@ export default function ReportesDiariosPage() {
                                       </p>
                                     </div>
                                     
-                                    {rep.validado !== null && rep.validado !== undefined && (
-                                      <div className={cn("p-4 rounded-xl border", rep.validado ? "bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-900/30" : "bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/30")}>
-                                        <h4 className={cn("text-xs font-bold uppercase tracking-wider mb-2", rep.validado ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400")}>
-                                          {rep.validado ? 'Validación Exitosa' : 'Motivo de Rechazo'}
+                                    {getEstadoReporte(rep) !== 'pendiente' && (
+                                      <div className={cn("p-4 rounded-xl border", getEstadoReporte(rep) === 'aprobado' ? "bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-900/30" : "bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/30")}>
+                                        <h4 className={cn("text-xs font-bold uppercase tracking-wider mb-2", getEstadoReporte(rep) === 'aprobado' ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400")}>
+                                          {getEstadoReporte(rep) === 'aprobado' ? 'Validación Exitosa' : 'Motivo de Rechazo'}
                                         </h4>
                                         <p className="text-sm text-primary">
                                           {rep.notas_validacion || 'No se proporcionaron notas adicionales.'}

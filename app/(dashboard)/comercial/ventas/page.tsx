@@ -1,15 +1,17 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/useAuthStore';
 import { ventasService, VentaApi } from '@/lib/services/ventas';
 import { clientesService, ClienteApi } from '@/lib/services/clientes';
 import { extractErrorMessage } from '@/lib/services/api';
 import Card from '@/components/ui/Card';
 import Badge, { BadgeVariant } from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
 import { Select } from '@/components/ui/FormFields';
 import Pagination, { usePagination } from '@/components/ui/Pagination';
 import { formatCurrency, formatDate, getDefaultDateRange } from '@/lib/utils';
-import { Loader2, AlertCircle, BarChart3 } from 'lucide-react';
+import { Loader2, AlertCircle, BarChart3, Plus } from 'lucide-react';
 
 const PER_PAGE = 8;
 
@@ -19,6 +21,8 @@ const estadoVariant: Record<string, BadgeVariant> = {
 
 export default function VentasPage() {
   const router = useRouter();
+  const { currentUser } = useAuthStore();
+  const canCreate = currentUser?.rol?.nombre === 'administrador';
   const [ventas, setVentas] = useState<VentaApi[]>([]);
   const [clientes, setClientes] = useState<ClienteApi[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,11 +56,18 @@ export default function VentasPage() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
-          <BarChart3 className="text-brand-600" size={26} /> Ventas
-        </h1>
-        <p className="text-sm text-muted">Registro y seguimiento de ventas</p>
+      <div className="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
+            <BarChart3 className="text-brand-600" size={26} /> Ventas
+          </h1>
+          <p className="text-sm text-muted">Registro y seguimiento de ventas</p>
+        </div>
+        {canCreate && (
+          <Button onClick={() => router.push('/comercial/ventas/nueva')}>
+            <Plus size={16} /> Nueva Venta Directa
+          </Button>
+        )}
       </div>
 
       <Card>

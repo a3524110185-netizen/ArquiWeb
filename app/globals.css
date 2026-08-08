@@ -36,6 +36,14 @@
     --border: #E2E8F0;
     --border-focus: #2563EB;
     --shadow-color: rgba(0, 0, 0, 0.06);
+
+    /* Colores categóricos para gráficas (orden fijo, no ciclar) */
+    --chart-1: #2a78d6;
+    --chart-2: #eb6834;
+    --chart-3: #1baf7a;
+    --chart-4: #eda100;
+    --chart-5: #e87ba4;
+    --chart-6: #008300;
   }
 
   .dark {
@@ -48,6 +56,13 @@
     --border: #334155;
     --border-focus: #3B82F6;
     --shadow-color: rgba(0, 0, 0, 0.3);
+
+    --chart-1: #3987e5;
+    --chart-2: #d95926;
+    --chart-3: #199e70;
+    --chart-4: #c98500;
+    --chart-5: #d55181;
+    --chart-6: #008300;
   }
 
   * {

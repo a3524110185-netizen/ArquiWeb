@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type {
-  Proyecto, Usuario, Incidencia, ReporteDiario, Gasto,
+  Proyecto, Usuario, Incidencia, ReporteDiario,
   RegistroHorario, DiaNolaboral, Categoria, Material, Proveedor,
   ActividadReciente, Notificacion, IncidenciaEstado,
   Empresa, Auditoria, Licencia, Cotizacion, CotizacionItem, PedidoVenta, Venta,
@@ -308,24 +308,6 @@ const reportesMock: ReporteDiario[] = [
   { id: 'r15', proyecto: 'Bodega Industrial Zona Sur', proyectoId: 'p7', fecha: '2025-05-29', turno: 'Matutino', categoria: 'Eléctrico', porcentajeAvance: 53, descripcion: 'Canalización de tubería conduit para instalación eléctrica industrial.', supervisor: 'Sandra Reyes', fotos: ['https://picsum.photos/seed/r15a/800/600', 'https://picsum.photos/seed/r15b/800/600'], coordenadas: { lat: 20.6614, lng: -103.3608 }, estado: 'Aprobado' },
 ];
 
-const gastosMock: Gasto[] = [
-  { id: 'g1', proyecto: 'Puente Vehicular – Zona Norte', proyectoId: 'p1', categoria: 'Materiales', monto: 285000, fecha: '2025-05-30', descripcion: 'Compra de varilla corrugada 3/8\" y 1/2\" para armado de losa', capturista: 'María López' },
-  { id: 'g2', proyecto: 'Torre Corporativa Norte', proyectoId: 'p4', categoria: 'Mano de obra', monto: 145000, fecha: '2025-05-30', descripcion: 'Pago semanal cuadrilla de albañiles (25 trabajadores)', capturista: 'María López' },
-  { id: 'g3', proyecto: 'Remodelación del Parque Central', proyectoId: 'p2', categoria: 'Materiales', monto: 48500, fecha: '2025-05-29', descripcion: 'Adoquín de concreto 10x20x6cm, 500m²', capturista: 'María López' },
-  { id: 'g4', proyecto: 'Pavimentación Calle 5 de Mayo', proyectoId: 'p3', categoria: 'Equipo', monto: 32000, fecha: '2025-05-29', descripcion: 'Renta de compactadora vibratoria por 3 días', capturista: 'María López' },
-  { id: 'g5', proyecto: 'Puente Vehicular – Zona Norte', proyectoId: 'p1', categoria: 'Transporte', monto: 18500, fecha: '2025-05-28', descripcion: 'Flete de viguetas pretensadas desde planta prefabricadora', capturista: 'María López' },
-  { id: 'g6', proyecto: 'Torre Corporativa Norte', proyectoId: 'p4', categoria: 'Materiales', monto: 210000, fecha: '2025-05-28', descripcion: "Concreto premezclado f'c=300kg/cm² para columnas (45m³)", capturista: 'María López' },
-  { id: 'g7', proyecto: 'Remodelación del Parque Central', proyectoId: 'p2', categoria: 'Mano de obra', monto: 62000, fecha: '2025-05-27', descripcion: 'Mano de obra instalación de luminarias LED', capturista: 'María López' },
-  { id: 'g8', proyecto: 'Puente Vehicular – Zona Norte', proyectoId: 'p1', categoria: 'Otros', monto: 8500, fecha: '2025-05-26', descripcion: 'Equipos de protección personal (EPP) para 20 trabajadores', capturista: 'María López' },
-  { id: 'g9', proyecto: 'Pavimentación Calle 5 de Mayo', proyectoId: 'p3', categoria: 'Materiales', monto: 96000, fecha: '2025-05-25', descripcion: 'Material de sub-base triturado 1.5\", 120 ton', capturista: 'María López' },
-  { id: 'g10', proyecto: 'Torre Corporativa Norte', proyectoId: 'p4', categoria: 'Equipo', monto: 45000, fecha: '2025-05-24', descripcion: 'Renta de grúa torre por semana', capturista: 'María López' },
-  { id: 'g11', proyecto: 'Centro Comercial Las Palmas', proyectoId: 'p6', categoria: 'Materiales', monto: 320000, fecha: '2025-05-31', descripcion: 'Acero estructural A-36 para estructura principal, 15 ton', capturista: 'María López' },
-  { id: 'g12', proyecto: 'Bodega Industrial Zona Sur', proyectoId: 'p7', categoria: 'Mano de obra', monto: 78000, fecha: '2025-05-30', descripcion: 'Mano de obra especializada instalación cubierta metálica', capturista: 'María López' },
-  { id: 'g13', proyecto: 'Remodelación del Parque Central', proyectoId: 'p2', categoria: 'Transporte', monto: 12000, fecha: '2025-05-26', descripcion: 'Flete de luminarias LED desde proveedor', capturista: 'María López' },
-  { id: 'g14', proyecto: 'Torre Corporativa Norte', proyectoId: 'p4', categoria: 'Otros', monto: 25000, fecha: '2025-05-23', descripcion: 'Seguro de obra mensual', capturista: 'María López' },
-  { id: 'g15', proyecto: 'Puente Vehicular – Zona Norte', proyectoId: 'p1', categoria: 'Materiales', monto: 156000, fecha: '2025-05-22', descripcion: 'Impermeabilizante elastomérico 200 cubetas', capturista: 'María López' },
-];
-
 const horariosMock: RegistroHorario[] = [
   { id: 'h1', trabajadorId: 'u1', trabajador: 'Carlos Martínez', fecha: '2025-05-26', entrada: '07:00', inicioComida: '13:00', finComida: '14:00', salida: '17:00', horasNormales: 9, horasExtras: 0, estado: 'Completo' },
   { id: 'h2', trabajadorId: 'u1', trabajador: 'Carlos Martínez', fecha: '2025-05-27', entrada: '07:00', inicioComida: '13:00', finComida: '14:00', salida: '19:30', horasNormales: 9, horasExtras: 2.5, estado: 'Completo' },
@@ -557,7 +539,6 @@ interface AppState {
   usuarios: Usuario[];
   incidencias: Incidencia[];
   reportes: ReporteDiario[];
-  gastos: Gasto[];
   horarios: RegistroHorario[];
   diasNoLaborales: DiaNolaboral[];
   categorias: Categoria[];
@@ -605,10 +586,6 @@ interface AppState {
   addProveedor: (p: Omit<Proveedor, 'id'>) => void;
   updateProveedor: (id: string, p: Partial<Proveedor>) => void;
   deleteProveedor: (id: string) => void;
-
-  // CRUD Gastos
-  addGasto: (g: Omit<Gasto, 'id'>) => void;
-  deleteGasto: (id: string) => void;
 
   // CRUD Dias no laborales
   addDiaNolaboral: (d: Omit<DiaNolaboral, 'id'>) => void;
@@ -663,7 +640,6 @@ export const useStore = create<AppState>((set) => ({
   usuarios: usuariosMock,
   incidencias: incidenciasMock,
   reportes: reportesMock,
-  gastos: gastosMock,
   horarios: horariosMock,
   diasNoLaborales: diasNoLaboralesMock,
   categorias: categoriasMock,
@@ -711,9 +687,6 @@ export const useStore = create<AppState>((set) => ({
   addProveedor: (p) => set((s) => ({ proveedores: [...s.proveedores, { ...p, id: uid() }] })),
   updateProveedor: (id, p) => set((s) => ({ proveedores: s.proveedores.map(x => x.id === id ? { ...x, ...p } : x) })),
   deleteProveedor: (id) => set((s) => ({ proveedores: s.proveedores.filter(x => x.id !== id) })),
-
-  addGasto: (g) => set((s) => ({ gastos: [{ ...g, id: uid() }, ...s.gastos] })),
-  deleteGasto: (id) => set((s) => ({ gastos: s.gastos.filter(x => x.id !== id) })),
 
   addDiaNolaboral: (d) => set((s) => ({ diasNoLaborales: [...s.diasNoLaborales, { ...d, id: uid() }] })),
   updateDiaNolaboral: (id, d) => set((s) => ({ diasNoLaborales: s.diasNoLaborales.map(x => x.id === id ? { ...x, ...d } : x) })),

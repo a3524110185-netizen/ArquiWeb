@@ -93,7 +93,19 @@ export const rhService = {
     });
     const queryString = query.toString() ? `?${query.toString()}` : '';
     const response = await api.get<any>(`/reporte-horas${queryString}`);
-    return extractArray<ReporteHorasUsuario>(response.data, ['resumen', 'reporte', 'usuarios']);
+    const data = extractArray<any>(response.data, ['resumen', 'reporte', 'usuarios']);
+    return data.map((item): ReporteHorasUsuario => ({
+      usuario: {
+        id: item.usuario?.id ?? item.usuario_id,
+        nombre: item.usuario?.nombre ?? item.nombre,
+        email: item.usuario?.email ?? item.email,
+      },
+      total_horas: Number(item.total_horas) || 0,
+      horas_extra: Number(item.horas_extra) || 0,
+      faltas: Number(item.faltas) || 0,
+      dias_trabajados: Number(item.dias_trabajados) || 0,
+      dias: item.dias || [],
+    }));
   },
 
   // ─── Control Horario ───────────────────────────────────────────────────
@@ -141,12 +153,12 @@ export interface ReporteHorasDia {
 }
 
 export interface ReporteHorasUsuario {
-  usuario_id: number;
-  usuario?: { id: number; nombre: string };
+  usuario: { id: number; nombre: string; email?: string };
   total_horas: number;
   horas_extra: number;
   faltas: number;
-  detalle?: ReporteHorasDia[];
+  dias_trabajados: number;
+  dias: ReporteHorasDia[];
 }
 
 export interface ControlHorarioParams {

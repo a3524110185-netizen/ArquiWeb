@@ -48,10 +48,18 @@ interface ReporteApi {
   supervisor?: string;
   fotos?: { url: string; ruta?: string }[] | string[];
   fotos_count?: number;
-  validado?: boolean;
+  validado?: boolean | null;
   notas_validacion?: string | null;
   validado_el?: string | null;
   validador?: { id: number; nombre: string } | null;
+  estado?: 'pendiente' | 'aprobado' | 'rechazado';
+}
+
+// La API expone 'estado' como fuente de verdad; 'validado' solo indica si ya fue
+// aprobado (true) — false cubre tanto "pendiente" como "rechazado".
+function getEstadoReporte(r: Pick<ReporteApi, 'estado' | 'validado'>): 'pendiente' | 'aprobado' | 'rechazado' {
+  if (r.estado === 'pendiente' || r.estado === 'aprobado' || r.estado === 'rechazado') return r.estado;
+  return r.validado === true ? 'aprobado' : 'pendiente';
 }
 
 interface ActividadApi {
@@ -119,7 +127,7 @@ export default function ProyectoDetallePage() {
       await proyectosService.validarReporte(reporteId, accion, notas);
       setReportes(prev => prev.map(r =>
         r.id === reporteId
-          ? { ...r, validado: accion === 'aprobar', notas_validacion: notas ?? r.notas_validacion }
+          ? { ...r, validado: accion === 'aprobar', estado: accion === 'aprobar' ? 'aprobado' : 'rechazado', notas_validacion: notas ?? r.notas_validacion }
           : r
       ));
     } catch (err: any) {
@@ -389,7 +397,7 @@ export default function ProyectoDetallePage() {
                          {/* Columna de validación — solo para Gerente */}
                          {isGerente && (
                            <td className="py-3 px-3">
-                             {r.validado ? (
+                             {getEstadoReporte(r) === 'aprobado' ? (
                                <div className="space-y-1">
                                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full">
                                    <CheckCircle2 size={11} /> Aprobado
@@ -406,6 +414,25 @@ export default function ProyectoDetallePage() {
                                  >
                                    {validandoId === r.id ? <Loader2 size={10} className="animate-spin" /> : <Ban size={10} />}
                                    Rechazar
+                                 </button>
+                               </div>
+                             ) : getEstadoReporte(r) === 'rechazado' ? (
+                               <div className="space-y-1">
+                                 <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 bg-red-50 dark:bg-red-900/20 px-2 py-0.5 rounded-full">
+                                   <XCircle size={11} /> Rechazado
+                                 </span>
+                                 {r.notas_validacion && (
+                                   <p className="text-[10px] text-muted line-clamp-1" title={r.notas_validacion}>
+                                     {r.notas_validacion}
+                                   </p>
+                                 )}
+                                 <button
+                                   onClick={() => handleValidarReporte(r.id, 'aprobar')}
+                                   disabled={validandoId === r.id}
+                                   className="text-[10px] text-emerald-600 hover:underline disabled:opacity-50 flex items-center gap-0.5"
+                                 >
+                                   {validandoId === r.id ? <Loader2 size={10} className="animate-spin" /> : <CheckCircle2 size={10} />}
+                                   Aprobar
                                  </button>
                                </div>
                              ) : (
