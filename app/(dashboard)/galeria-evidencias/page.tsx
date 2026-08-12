@@ -38,9 +38,11 @@ function PhotoSkeleton() {
 }
 
 // ─── Página ───────────────────────────────────────────────────────────────────
+const TODOS = '';
+
 export default function GaleriaEvidenciasPage() {
   const [proyectos, setProyectos] = useState<ProyectoApi[]>([]);
-  const [selectedProyecto, setSelectedProyecto] = useState<string>('');
+  const [selectedProyecto, setSelectedProyecto] = useState<string>(TODOS);
   const [fotos, setFotos] = useState<FotoItem[]>([]);
   const [loadingProyectos, setLoadingProyectos] = useState(true);
   const [loadingFotos, setLoadingFotos] = useState(false);
@@ -55,10 +57,6 @@ export default function GaleriaEvidenciasPage() {
     try {
       const data = await proyectosService.getProyectos();
       setProyectos(data);
-      // Auto-seleccionar el primero si existe
-      if (data.length > 0 && !selectedProyecto) {
-        setSelectedProyecto(String(data[0].id));
-      }
     } catch (err: any) {
       setErrorProyectos(err.message || 'Error al cargar proyectos.');
     } finally {
@@ -68,37 +66,53 @@ export default function GaleriaEvidenciasPage() {
 
   useEffect(() => { fetchProyectos(); }, [fetchProyectos]);
 
-  // ── Cargar fotos del proyecto seleccionado ──────────────────────────────────
+  // ── Extraer fotos de la lista de reportes de un proyecto ────────────────────
+  const extraerFotos = (reportes: any[], nombreProyecto: string, proyectoId: number): FotoItem[] => {
+    const items: FotoItem[] = [];
+    reportes.forEach((reporte: any) => {
+      const fotosList: any[] = reporte.fotos || reporte.evidencias || [];
+      fotosList.forEach((foto: any) => {
+        const url = getFotoUrl(foto);
+        if (url) {
+          items.push({
+            url,
+            proyecto: nombreProyecto,
+            proyectoId,
+            fecha: reporte.fecha || reporte.created_at || '',
+            descripcion: reporte.descripcion,
+            reporteId: reporte.id,
+          });
+        }
+      });
+    });
+    return items;
+  };
+
+  // ── Cargar fotos: de un proyecto específico, o de todos ─────────────────────
   const fetchFotos = useCallback(async () => {
-    if (!selectedProyecto) return;
+    if (proyectos.length === 0) return;
     setLoadingFotos(true);
     setErrorFotos(null);
     setFotos([]);
     try {
-      const proyecto = proyectos.find(p => String(p.id) === selectedProyecto);
-      const nombreProyecto = proyecto?.nombre || `Proyecto #${selectedProyecto}`;
-
-      const reportes = await proyectosService.getReportes(selectedProyecto);
-      const items: FotoItem[] = [];
-
-      reportes.forEach((reporte: any) => {
-        const fotosList: any[] = reporte.fotos || reporte.evidencias || [];
-        fotosList.forEach((foto: any) => {
-          const url = getFotoUrl(foto);
-          if (url) {
-            items.push({
-              url,
-              proyecto: nombreProyecto,
-              proyectoId: Number(selectedProyecto),
-              fecha: reporte.fecha || reporte.created_at || '',
-              descripcion: reporte.descripcion,
-              reporteId: reporte.id,
-            });
-          }
-        });
-      });
-
-      setFotos(items);
+      if (selectedProyecto) {
+        const proyecto = proyectos.find(p => String(p.id) === selectedProyecto);
+        const nombreProyecto = proyecto?.nombre || `Proyecto #${selectedProyecto}`;
+        const reportes = await proyectosService.getReportes(selectedProyecto);
+        setFotos(extraerFotos(reportes, nombreProyecto, Number(selectedProyecto)));
+      } else {
+        const resultados = await Promise.all(
+          proyectos.map(async (p) => {
+            try {
+              const reportes = await proyectosService.getReportes(p.id);
+              return extraerFotos(reportes, p.nombre, p.id);
+            } catch {
+              return [];
+            }
+          })
+        );
+        setFotos(resultados.flat());
+      }
     } catch (err: any) {
       setErrorFotos(err.message || 'Error al cargar fotos.');
     } finally {
@@ -107,8 +121,8 @@ export default function GaleriaEvidenciasPage() {
   }, [selectedProyecto, proyectos]);
 
   useEffect(() => {
-    if (selectedProyecto) fetchFotos();
-  }, [selectedProyecto]);
+    if (proyectos.length > 0) fetchFotos();
+  }, [proyectos, selectedProyecto]);
 
   const proyectoActual = proyectos.find(p => String(p.id) === selectedProyecto);
 
@@ -122,7 +136,7 @@ export default function GaleriaEvidenciasPage() {
           </h1>
           <p className="text-sm text-muted mt-0.5">Fotografías y respaldos visuales de obra</p>
         </div>
-        {selectedProyecto && !loadingFotos && (
+        {proyectos.length > 0 && !loadingFotos && (
           <button onClick={fetchFotos}
             className="btn-secondary inline-flex items-center gap-2 text-xs">
             <RefreshCw size={14} /> Actualizar
@@ -153,7 +167,7 @@ export default function GaleriaEvidenciasPage() {
               value={selectedProyecto}
               onChange={e => setSelectedProyecto(e.target.value)}
               className="input-base pr-10 appearance-none">
-              <option value="">— Selecciona un proyecto —</option>
+              <option value={TODOS}>— Todos los proyectos —</option>
               {proyectos.map(p => (
                 <option key={p.id} value={String(p.id)}>
                   {p.codigo ? `${p.codigo} · ` : ''}{p.nombre}
@@ -165,19 +179,8 @@ export default function GaleriaEvidenciasPage() {
         )}
       </Card>
 
-      {/* Estado: sin proyecto seleccionado */}
-      {!selectedProyecto && !loadingProyectos && proyectos.length > 0 && (
-        <Card className="p-12 text-center space-y-3">
-          <div className="w-16 h-16 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
-            <ImageIcon size={32} />
-          </div>
-          <h2 className="text-lg font-semibold text-primary">Selecciona un Proyecto</h2>
-          <p className="text-sm text-muted">Elige un proyecto del dropdown para ver sus evidencias fotográficas.</p>
-        </Card>
-      )}
-
       {/* Error al cargar fotos */}
-      {errorFotos && selectedProyecto && (
+      {errorFotos && proyectos.length > 0 && (
         <Card className="p-6 text-center border-red-200 dark:border-red-900/30 space-y-3">
           <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/20 text-red-600 flex items-center justify-center mx-auto">
             <AlertCircle size={20} />
@@ -190,18 +193,18 @@ export default function GaleriaEvidenciasPage() {
       )}
 
       {/* Grid de fotos */}
-      {selectedProyecto && (
+      {proyectos.length > 0 && (
         <>
-          {proyectoActual && (
-            <div className="flex items-center gap-2">
-              <h2 className="text-sm font-semibold text-primary">{proyectoActual.nombre}</h2>
-              {!loadingFotos && (
-                <span className="text-xs text-muted">
-                  · {fotos.length} foto{fotos.length !== 1 ? 's' : ''}
-                </span>
-              )}
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            <h2 className="text-sm font-semibold text-primary">
+              {proyectoActual ? proyectoActual.nombre : 'Todos los proyectos'}
+            </h2>
+            {!loadingFotos && (
+              <span className="text-xs text-muted">
+                · {fotos.length} foto{fotos.length !== 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
             {loadingFotos
@@ -212,7 +215,9 @@ export default function GaleriaEvidenciasPage() {
                     <ImageIcon size={40} className="text-muted mx-auto" />
                     <p className="text-sm font-medium text-secondary">Sin evidencias fotográficas</p>
                     <p className="text-xs text-muted">
-                      Este proyecto aún no tiene fotos en sus reportes de avance.
+                      {proyectoActual
+                        ? 'Este proyecto aún no tiene fotos en sus reportes de avance.'
+                        : 'Ninguno de tus proyectos tiene fotos en sus reportes de avance todavía.'}
                     </p>
                   </div>
                 )
@@ -230,10 +235,15 @@ export default function GaleriaEvidenciasPage() {
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
                       <ZoomIn size={20} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
-                    {/* Fecha */}
-                    {foto.fecha && (
+                    {/* Proyecto (solo en vista "Todos") + Fecha */}
+                    {(foto.fecha || !proyectoActual) && (
                       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <p className="text-[10px] text-white">{formatDate(foto.fecha)}</p>
+                        {!proyectoActual && (
+                          <p className="text-[10px] text-white font-medium truncate">{foto.proyecto}</p>
+                        )}
+                        {foto.fecha && (
+                          <p className="text-[10px] text-white/80">{formatDate(foto.fecha)}</p>
+                        )}
                       </div>
                     )}
                   </button>
