@@ -204,7 +204,15 @@ export const proyectosService = {
 
   // GET /api/clientes
   async getClientes(): Promise<Cliente[]> {
-    return clientesService.getClientes();
+    const clientes = await clientesService.getClientes();
+    return clientes.map((c) => ({
+      id: c.id,
+      nombre: c.nombre,
+      rfc: c.rfc ?? undefined,
+      email: c.email ?? undefined,
+      telefono: c.telefono ?? undefined,
+      direccion: c.direccion ?? undefined,
+    }));
   },
 
   // GET /api/proyectos/{id}/reportes
