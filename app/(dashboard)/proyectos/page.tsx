@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { proyectosService, ProyectoApi } from '@/lib/services/proyectos';
 import Card from '@/components/ui/Card';
 import Badge, { proyectoEstadoVariant, getEstadoLabel } from '@/components/ui/Badge';
-import { formatDate } from '@/lib/utils';
+import { formatDate, resolveMediaUrl } from '@/lib/utils';
 import { 
   FolderOpen, 
   Plus, 
@@ -235,7 +235,7 @@ export default function ProyectosPage() {
                         <div className="flex items-center gap-3">
                           {proyecto.imagen_portada ? (
                             <img
-                              src={proyecto.imagen_portada}
+                              src={resolveMediaUrl(proyecto.imagen_portada)}
                               alt={proyecto.nombre}
                               className="w-9 h-9 rounded-lg object-cover shrink-0 border border-default"
                             />

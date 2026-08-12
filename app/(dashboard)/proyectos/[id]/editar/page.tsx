@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { proyectosService, ProyectoApi, Cliente, UsuarioProyecto } from '@/lib/services/proyectos';
+import { resolveMediaUrl } from '@/lib/utils';
 import Card, { CardHeader, CardTitle } from '@/components/ui/Card';
 import { useToast } from '@/components/ui/Toast';
 import { 
@@ -77,7 +78,7 @@ export default function EditarProyectoPage() {
       setPresupuesto(proyectoData.presupuesto !== null && proyectoData.presupuesto !== undefined ? String(proyectoData.presupuesto) : '');
       setEstado(proyectoData.estado || 'planeado');
       if (proyectoData.imagen_portada) {
-        setImagePreview(proyectoData.imagen_portada);
+        setImagePreview(resolveMediaUrl(proyectoData.imagen_portada));
       }
 
       setClientes(clientesData);

@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { proyectosService, ProyectoApi } from '@/lib/services/proyectos';
 import Card, { CardHeader, CardTitle } from '@/components/ui/Card';
 import Badge, { proyectoEstadoVariant, getEstadoLabel, severidadVariant } from '@/components/ui/Badge';
-import { formatCurrency, formatDate, formatDateTime, timeAgo } from '@/lib/utils';
+import { formatCurrency, formatDate, formatDateTime, timeAgo, resolveMediaUrl } from '@/lib/utils';
 import {
   ArrowLeft,
   Building2,
@@ -233,7 +233,7 @@ export default function ProyectoDetallePage() {
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             {proyecto.imagen_portada ? (
-              <img src={proyecto.imagen_portada} alt={proyecto.nombre}
+              <img src={resolveMediaUrl(proyecto.imagen_portada)} alt={proyecto.nombre}
                 className="w-20 h-20 rounded-2xl object-cover border border-default shrink-0 shadow-sm" />
             ) : (
               <div className="w-20 h-20 rounded-2xl gradient-brand text-white flex items-center justify-center shrink-0 shadow-sm">

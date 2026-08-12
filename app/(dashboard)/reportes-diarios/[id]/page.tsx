@@ -7,7 +7,7 @@ import { ReporteApi } from '@/lib/services/reportes';
 import { ApiError, extractErrorMessage } from '@/lib/services/api';
 import Card, { CardHeader, CardTitle } from '@/components/ui/Card';
 import Badge, { reporteEstadoVariant } from '@/components/ui/Badge';
-import { formatDate, formatDateTime } from '@/lib/utils';
+import { formatDate, formatDateTime, resolveMediaUrl } from '@/lib/utils';
 import { ArrowLeft, Calendar, User, MapPin, Tag, FileText, CheckCircle, XCircle, Loader2, AlertCircle, Mail, Phone } from 'lucide-react';
 
 function estadoLabel(validado: boolean | null): string {
@@ -132,7 +132,7 @@ export default function ReporteDetallePage() {
             <CardHeader><CardTitle>Evidencia Fotográfica ({reporte.fotos_count ?? reporte.fotos.length})</CardTitle></CardHeader>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {reporte.fotos.map((f) => {
-                const url = (f as any).url || (f as any).ruta || (f as any).path;
+                const url = resolveMediaUrl((f as any).url || (f as any).ruta || (f as any).path);
                 return (
                 <div key={f.id} className="relative aspect-video rounded-xl overflow-hidden cursor-pointer group" onClick={() => setFotoModal(url)}>
                   <img src={url} alt={f.descripcion || 'Evidencia'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />

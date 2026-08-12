@@ -4,7 +4,7 @@ import { FileText } from 'lucide-react';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { proyectosService, ProyectoApi, ReporteApi } from '@/lib/services/proyectos';
-import { formatDate } from '@/lib/utils';
+import { formatDate, resolveMediaUrl } from '@/lib/utils';
 import {
   ClipboardList,
   FolderOpen,
@@ -557,7 +557,7 @@ export default function ReportesDiariosPage() {
                                     {rep.fotos && rep.fotos.length > 0 ? (
                                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                                         {rep.fotos.map((f: any, idx: number) => {
-                                          const url = f.url || f.ruta;
+                                          const url = resolveMediaUrl(f.url || f.ruta);
                                           return url ? (
                                             <div 
                                               key={idx} 

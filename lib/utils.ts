@@ -1,8 +1,32 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { API_URL } from './services/api';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+// Origen del backend sin el sufijo /api (para servir /storage/...)
+const API_ORIGIN = API_URL.replace(/\/api\/?$/, '');
+
+export function resolveMediaUrl(url?: string | null): string {
+  if (!url) return '';
+
+  if (/^https?:\/\//i.test(url)) {
+    // Absoluta pero con host localhost/127.0.0.1 desactualizado -> reescribir con el origen real
+    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(url)) {
+      try {
+        const parsed = new URL(url);
+        return `${API_ORIGIN}${parsed.pathname}${parsed.search}`;
+      } catch {
+        return url;
+      }
+    }
+    return url; // ya es absoluta y válida
+  }
+
+  // Relativa -> anteponer el origen del backend
+  return `${API_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
 }
 
 export function formatCurrency(amount: number): string {

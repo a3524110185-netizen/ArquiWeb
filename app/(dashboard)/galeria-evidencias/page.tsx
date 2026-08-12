@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { proyectosService, ProyectoApi } from '@/lib/services/proyectos';
 import Card from '@/components/ui/Card';
-import { formatDate } from '@/lib/utils';
+import { formatDate, resolveMediaUrl } from '@/lib/utils';
 import {
   Image as ImageIcon,
   ChevronDown,
@@ -26,8 +26,8 @@ interface FotoItem {
 }
 
 function getFotoUrl(foto: any): string {
-  if (typeof foto === 'string') return foto;
-  return foto?.url || foto?.ruta || foto?.path || '';
+  const raw = typeof foto === 'string' ? foto : (foto?.url || foto?.ruta || foto?.path || '');
+  return resolveMediaUrl(raw);
 }
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
