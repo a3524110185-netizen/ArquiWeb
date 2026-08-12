@@ -131,9 +131,11 @@ export default function ReporteDetallePage() {
           <Card>
             <CardHeader><CardTitle>Evidencia Fotográfica ({reporte.fotos_count ?? reporte.fotos.length})</CardTitle></CardHeader>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {reporte.fotos.map((f) => (
-                <div key={f.id} className="relative aspect-video rounded-xl overflow-hidden cursor-pointer group" onClick={() => setFotoModal(f.url)}>
-                  <img src={f.url} alt={f.descripcion || 'Evidencia'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              {reporte.fotos.map((f) => {
+                const url = (f as any).url || (f as any).ruta || (f as any).path;
+                return (
+                <div key={f.id} className="relative aspect-video rounded-xl overflow-hidden cursor-pointer group" onClick={() => setFotoModal(url)}>
+                  <img src={url} alt={f.descripcion || 'Evidencia'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                   {f.es_principal && (
                     <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-brand-600 text-white text-[10px] font-semibold">Principal</span>
                   )}
@@ -141,7 +143,8 @@ export default function ReporteDetallePage() {
                     <span className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[10px] px-2 py-1 truncate">{f.descripcion}</span>
                   )}
                 </div>
-              ))}
+                );
+              })}
               {reporte.fotos.length === 0 && <p className="col-span-3 text-sm text-muted text-center py-4">Sin fotografías anexadas</p>}
             </div>
           </Card>
