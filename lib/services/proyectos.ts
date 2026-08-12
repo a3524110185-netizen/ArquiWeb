@@ -1,4 +1,5 @@
 import { api, API_URL } from './api';
+import { clientesService } from './clientes';
 
 export interface FotoReporte {
   id: number;
@@ -203,10 +204,7 @@ export const proyectosService = {
 
   // GET /api/clientes
   async getClientes(): Promise<Cliente[]> {
-    const response = await api.get<any>('/clientes');
-    if (Array.isArray(response.data)) return response.data;
-    if (response.data && Array.isArray(response.data.data)) return response.data.data;
-    return [];
+    return clientesService.getClientes();
   },
 
   // GET /api/proyectos/{id}/reportes
