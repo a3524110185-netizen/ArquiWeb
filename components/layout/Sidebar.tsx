@@ -12,6 +12,7 @@ import {
   Building2, ClipboardList, ShieldAlert, FileCheck,
   ShoppingCart, BarChart3, Boxes, LogOut, ShieldCheck,
   UserCircle, Timer, Briefcase, CalendarCheck, Hammer, X,
+  Globe,
 } from 'lucide-react';
 import type { AuthRole } from '@/types';
 
@@ -173,6 +174,18 @@ const supervisorNav: NavGroup[] = [
   },
 ];
 
+// ─── Nav para SUPERADMIN (gestión global multi-empresa) ───────────────────────
+const superAdminNav: NavGroup[] = [
+  {
+    title: 'Superadmin',
+    items: [
+      { label: 'Dashboard Superadmin', href: '/dashboard-superadmin', icon: LayoutDashboard },
+      { label: 'Empresas', href: '/superadmin/empresas', icon: Building2 },
+      { label: 'Usuarios Globales', href: '/superadmin/usuarios', icon: Globe },
+    ],
+  },
+];
+
 // ─── Seleccionar nav según el rol ─────────────────────────────────────────────
 function getNavForRole(role: AuthRole | undefined): NavGroup[] {
   switch (role) {
@@ -180,6 +193,7 @@ function getNavForRole(role: AuthRole | undefined): NavGroup[] {
     case 'gerente':       return gerenteNav;
     case 'ingeniero':     return ingenieroNav;
     case 'supervisor':    return supervisorNav;
+    case 'superadmin':    return superAdminNav;
     default:              return gerenteNav;
   }
 }
@@ -190,6 +204,7 @@ const roleColors: Record<string, string> = {
   gerente:       'bg-blue-600',
   supervisor:    'bg-amber-500',
   ingeniero:     'bg-emerald-500',
+  superadmin:    'bg-slate-900',
 };
 
 // ─── Etiquetas de rol en español ─────────────────────────────────────────────
@@ -198,6 +213,7 @@ const roleLabels: Record<string, string> = {
   gerente:       'Gerente',
   supervisor:    'Supervisor',
   ingeniero:     'Ingeniero',
+  superadmin:    'Superadmin',
 };
 
 export default function Sidebar() {

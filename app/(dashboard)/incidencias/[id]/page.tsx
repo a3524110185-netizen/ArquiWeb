@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { incidenciasService } from '@/lib/services/incidencias';
-import { proyectosService } from '@/lib/services/proyectos';
+import { proyectosService, UsuarioProyecto } from '@/lib/services/proyectos';
 import Card, { CardHeader, CardTitle } from '@/components/ui/Card';
 import Badge, { severidadVariant, estadoIncVariant } from '@/components/ui/Badge';
 import { formatDate, formatDateTime, timeAgo } from '@/lib/utils';
@@ -89,7 +89,7 @@ export default function IncidenciaDetallePage() {
   const [sendingComment, setSendingComment] = useState(false);
 
   // States para gestión de Gerente
-  const [ingenieros, setIngenieros] = useState<any[]>([]);
+  const [ingenieros, setIngenieros] = useState<UsuarioProyecto[]>([]);
   const [selectedAsignadoId, setSelectedAsignadoId] = useState('');
   const [selectedEstado, setSelectedEstado] = useState('');
   const [errorIngenieros, setErrorIngenieros] = useState<string | null>(null);
@@ -121,15 +121,10 @@ export default function IncidenciaDetallePage() {
       if (rolNombre === 'gerente' || rolNombre === 'administrador') {
         setErrorIngenieros(null);
         try {
-          const projData = await proyectosService.getProyecto(inc.proyecto_id);
-          const users = projData.usuarios || [];
-          const ings = users.filter((u: any) => {
-            const rolProyecto = (u.pivot?.rol_proyecto || u.rol?.nombre || '').toLowerCase();
-            return rolProyecto.includes('ingeniero');
-          });
+          const ings = await proyectosService.getUsuariosDisponibles(inc.proyecto_id, 'ingeniero');
           setIngenieros(ings);
         } catch (e: any) {
-          console.error('Error al obtener el detalle del proyecto:', e);
+          console.error('Error al obtener los ingenieros disponibles:', e);
           if (e?.status === 403) {
             setErrorIngenieros('No tienes acceso para ver los usuarios de este proyecto.');
           } else if (e?.status === 404) {

@@ -63,6 +63,10 @@ const ROLE_ACCESS: Record<string, string[]> = {
     '/reporte-horas',      // Solo sus propias horas (filtrado en frontend)
     '/asistencia',         // Universal - todos los roles
   ],
+  superadmin: [
+    '/dashboard-superadmin', // Dashboard con KPIs globales
+    '/superadmin',            // Gestión de empresas y usuarios globales
+  ],
 };
 
 /**

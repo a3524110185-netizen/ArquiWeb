@@ -10,6 +10,7 @@ export const ROLE_REDIRECTS: Record<AuthRole, string> = {
   gerente:       '/dashboard',
   supervisor:    '/asistencia',
   ingeniero:     '/asistencia',
+  superadmin:    '/dashboard-superadmin',
 };
 
 // Parsea la respuesta de GET /auth/me (soporta tanto { data: usuario } como { data: { usuario } })

@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 
 // Roles con acceso a la app web completa (con sidebar)
-const ROLES_CON_ACCESO = ['administrador', 'gerente', 'supervisor', 'ingeniero'];
+const ROLES_CON_ACCESO = ['administrador', 'gerente', 'supervisor', 'ingeniero', 'superadmin'];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { sidebarCollapsed } = useStore();

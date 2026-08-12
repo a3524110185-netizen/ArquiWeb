@@ -1,5 +1,5 @@
 // ─── Auth ────────────────────────────────────────────────────────────────────
-export type AuthRole = 'administrador' | 'gerente' | 'supervisor' | 'ingeniero';
+export type AuthRole = 'administrador' | 'gerente' | 'supervisor' | 'ingeniero' | 'superadmin';
 
 export interface EmpresaResumen {
   id: number;
@@ -60,6 +60,33 @@ export interface Empresa {
   fechaVencimiento: string;
   usuariosCount: number;
   proyectosCount: number;
+}
+
+// ─── Empresa (API real — Superadmin) ──────────────────────────────────────────
+export interface EmpresaApi {
+  id: number;
+  nombre: string;
+  rfc?: string | null;
+  direccion?: string | null;
+  telefono?: string | null;
+  email?: string | null;
+  logo_path?: string | null;
+  activo: boolean;
+  created_at: string;
+  updated_at: string;
+  usuarios_count?: number;
+  proyectos_count?: number;
+}
+
+// ─── Estadísticas Globales (Superadmin) ───────────────────────────────────────
+export interface EstadisticasGlobales {
+  total_empresas: number;
+  empresas_activas: number;
+  total_usuarios: number;
+  total_proyectos: number;
+  total_ventas: number;
+  usuarios_por_rol: { rol: string; total: number }[];
+  empresas_por_estado: { estado: string; total: number }[];
 }
 
 // ─── Licencia ─────────────────────────────────────────────────────────────────
