@@ -12,7 +12,7 @@ import { Select } from '@/components/ui/FormFields';
 import Pagination, { usePagination } from '@/components/ui/Pagination';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate, getDefaultDateRange } from '@/lib/utils';
-import { Clock, Loader2, AlertCircle, Search, FileText } from 'lucide-react';
+import { Clock, Loader2, AlertCircle, Search, FileText, FileSpreadsheet } from 'lucide-react';
 
 const PER_PAGE = 10;
 
@@ -39,7 +39,7 @@ export default function ControlHorarioPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [exportando, setExportando] = useState(false);
+  const [exportandoPDF, setExportandoPDF] = useState(false);
 
   const defaultRange = useMemo(() => getDefaultDateRange(), []);
   const [filtroUsuario, setFiltroUsuario] = useState('');
@@ -87,7 +87,7 @@ export default function ControlHorarioPage() {
 
   const exportarPDF = async () => {
     if (registros.length === 0) return;
-    setExportando(true);
+    setExportandoPDF(true);
     try {
       // Carga diferida: @react-pdf/renderer es pesado y solo se necesita al exportar.
       const [{ pdf }, { ControlHorarioPDF }] = await Promise.all([
@@ -129,7 +129,47 @@ export default function ControlHorarioPage() {
     } catch (err: any) {
       toast.error('Error al exportar', extractErrorMessage(err, 'No se pudo generar el PDF.'));
     } finally {
-      setExportando(false);
+      setExportandoPDF(false);
+    }
+  };
+
+  // Genera un CSV (Excel lo abre nativamente) sin dependencias externas:
+  // la librería estándar para .xlsx en npm (xlsx/SheetJS) tiene CVEs altos sin parchear.
+  const exportarExcel = () => {
+    if (registros.length === 0) return;
+    try {
+      const encabezados = ['Usuario', 'Fecha', 'Entrada', 'Inicio Comida', 'Fin Comida', 'Salida', 'Horas', 'Estado'];
+      const escaparCsv = (valor: string) => {
+        const str = String(valor ?? '');
+        return /[",\r\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+      };
+      const filas = registros.map(r => [
+        r.usuario?.nombre || `Usuario ${r.usuario_id}`,
+        formatDate(r.fecha),
+        r.entrada || '—',
+        r.comida_inicio || '—',
+        r.comida_fin || '—',
+        r.salida || '—',
+        r.horas != null ? String(r.horas) : '—',
+        r.estado ? r.estado.charAt(0).toUpperCase() + r.estado.slice(1) : '—',
+      ]);
+      const csv = [encabezados, ...filas].map(fila => fila.map(escaparCsv).join(',')).join('\r\n');
+      // BOM UTF-8 para que Excel detecte la codificación y muestre acentos/ñ correctamente.
+      const BOM = String.fromCharCode(0xfeff);
+      const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Control_Horario_${desde}_a_${hasta}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success('Excel exportado', 'El archivo se descargó correctamente.');
+    } catch (err: any) {
+      toast.error('Error al exportar', extractErrorMessage(err, 'No se pudo generar el archivo.'));
     }
   };
 
@@ -145,10 +185,15 @@ export default function ControlHorarioPage() {
           <p className="text-sm text-muted">Consulta de entradas, salidas y estado de asistencia por trabajador</p>
         </div>
         {canFilterUsuario && (
-          <Button onClick={exportarPDF} variant="secondary" disabled={exportando || registros.length === 0}>
-            {exportando ? <Loader2 size={16} className="animate-spin" /> : <FileText size={16} />}
-            {exportando ? 'Exportando...' : 'Exportar PDF'}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button onClick={exportarExcel} variant="secondary" disabled={registros.length === 0}>
+              <FileSpreadsheet size={16} /> Exportar Excel
+            </Button>
+            <Button onClick={exportarPDF} variant="secondary" disabled={exportandoPDF || registros.length === 0}>
+              {exportandoPDF ? <Loader2 size={16} className="animate-spin" /> : <FileText size={16} />}
+              {exportandoPDF ? 'Exportando...' : 'Exportar PDF'}
+            </Button>
+          </div>
         )}
       </div>
 
