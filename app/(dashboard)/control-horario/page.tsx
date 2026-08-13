@@ -7,10 +7,12 @@ import { proyectosService, ProyectoApi } from '@/lib/services/proyectos';
 import { extractErrorMessage, extractFieldErrors } from '@/lib/services/api';
 import Card from '@/components/ui/Card';
 import Badge, { BadgeVariant } from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
 import { Select } from '@/components/ui/FormFields';
 import Pagination, { usePagination } from '@/components/ui/Pagination';
+import { useToast } from '@/components/ui/Toast';
 import { formatDate, getDefaultDateRange } from '@/lib/utils';
-import { Clock, Loader2, AlertCircle, Search } from 'lucide-react';
+import { Clock, Loader2, AlertCircle, Search, FileText } from 'lucide-react';
 
 const PER_PAGE = 10;
 
@@ -27,6 +29,7 @@ const estadoVariant: Record<string, BadgeVariant> = {
 
 export default function ControlHorarioPage() {
   const { currentUser } = useAuthStore();
+  const toast = useToast();
   const userRole = currentUser?.rol?.nombre || '';
   const canFilterUsuario = userRole === 'administrador' || userRole === 'gerente';
 
@@ -36,6 +39,7 @@ export default function ControlHorarioPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [exportando, setExportando] = useState(false);
 
   const defaultRange = useMemo(() => getDefaultDateRange(), []);
   const [filtroUsuario, setFiltroUsuario] = useState('');
@@ -81,15 +85,71 @@ export default function ControlHorarioPage() {
     cargarRegistros();
   }, [cargarRegistros, canFilterUsuario, filtroUsuario]);
 
+  const exportarPDF = async () => {
+    if (registros.length === 0) return;
+    setExportando(true);
+    try {
+      // Carga diferida: @react-pdf/renderer es pesado y solo se necesita al exportar.
+      const [{ pdf }, { ControlHorarioPDF }] = await Promise.all([
+        import('@react-pdf/renderer'),
+        import('@/components/pdf/ControlHorarioPDF'),
+      ]);
+
+      const usuarioLabel = filtroUsuario
+        ? usuarios.find(u => String(u.id) === filtroUsuario)?.nombre
+        : undefined;
+      const proyectoLabel = filtroProyecto
+        ? proyectos.find(p => String(p.id) === filtroProyecto)?.nombre
+        : undefined;
+      const estadoLabel = filtroEstado !== 'todos'
+        ? ESTADO_OPTIONS.find(o => o.value === filtroEstado)?.label
+        : undefined;
+
+      const blob = await pdf(
+        <ControlHorarioPDF
+          registros={registros}
+          empresa={currentUser?.empresa_actual?.nombre || 'SIGO'}
+          rangoFechas={{ desde, hasta }}
+          usuarioFiltro={usuarioLabel}
+          proyectoFiltro={proyectoLabel}
+          estadoFiltro={estadoLabel}
+        />
+      ).toBlob();
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Control_Horario_${desde}_a_${hasta}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success('PDF exportado', 'El archivo se descargó correctamente.');
+    } catch (err: any) {
+      toast.error('Error al exportar', extractErrorMessage(err, 'No se pudo generar el PDF.'));
+    } finally {
+      setExportando(false);
+    }
+  };
+
   const { page, setPage, totalPages, paged, totalItems } = usePagination(registros, PER_PAGE);
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
-          <Clock className="text-brand-600" size={26} /> Control Horario
-        </h1>
-        <p className="text-sm text-muted">Consulta de entradas, salidas y estado de asistencia por trabajador</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
+            <Clock className="text-brand-600" size={26} /> Control Horario
+          </h1>
+          <p className="text-sm text-muted">Consulta de entradas, salidas y estado de asistencia por trabajador</p>
+        </div>
+        {canFilterUsuario && (
+          <Button onClick={exportarPDF} variant="secondary" disabled={exportando || registros.length === 0}>
+            {exportando ? <Loader2 size={16} className="animate-spin" /> : <FileText size={16} />}
+            {exportando ? 'Exportando...' : 'Exportar PDF'}
+          </Button>
+        )}
       </div>
 
       {/* Filtros */}
