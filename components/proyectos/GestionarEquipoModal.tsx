@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Modal from '@/components/ui/Modal';
+import Modal, { ConfirmDialog } from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import { proyectosService, UsuarioProyecto } from '@/lib/services/proyectos';
-import { Loader2, Plus, Trash2, ShieldCheck, HardHat } from 'lucide-react';
+import { Loader2, Plus, Trash2, ShieldCheck, HardHat, Users } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface GestionarEquipoModalProps {
@@ -26,7 +26,9 @@ export default function GestionarEquipoModal({
   const [loading, setLoading] = useState(false);
   const [adding, setAdding] = useState(false);
   const [removingId, setRemovingId] = useState<number | null>(null);
-  
+  const [asignandoTodos, setAsignandoTodos] = useState(false);
+  const [confirmMasivoOpen, setConfirmMasivoOpen] = useState(false);
+
   const [selectedRol, setSelectedRol] = useState<'supervisor' | 'ingeniero'>('supervisor');
   const [selectedUsuarioId, setSelectedUsuarioId] = useState<string>('');
 
@@ -78,6 +80,29 @@ export default function GestionarEquipoModal({
     }
   };
 
+  const asignarTodos = async () => {
+    if (disponibles.length === 0) return;
+    setAsignandoTodos(true);
+    try {
+      const usuarioIds = disponibles.map(u => u.id);
+      const resultado = await proyectosService.asignarMasivo(proyectoId, usuarioIds, selectedRol);
+      const omitidos = resultado.total - resultado.asignados;
+
+      if (omitidos > 0) {
+        toast(`${resultado.asignados} asignados, ${omitidos} omitidos`, { icon: '⚠️' });
+      } else {
+        toast.success(`${resultado.asignados} usuarios asignados correctamente`);
+      }
+
+      onUpdate();
+      cargarDisponibles(selectedRol);
+    } catch (error: any) {
+      toast.error(error.message || 'Error al asignar usuarios');
+    } finally {
+      setAsignandoTodos(false);
+    }
+  };
+
   return (
     <Modal open={open} onClose={onClose} title="Gestionar Equipo de Proyecto" size="lg">
       <div className="space-y-6">
@@ -110,7 +135,7 @@ export default function GestionarEquipoModal({
               ))}
             </select>
 
-            <Button 
+            <Button
               onClick={handleAsignar}
               disabled={!selectedUsuarioId || adding}
               className="shrink-0"
@@ -119,6 +144,20 @@ export default function GestionarEquipoModal({
               <span className="ml-2">Asignar</span>
             </Button>
           </div>
+
+          {disponibles.length > 0 && (
+            <div className="flex justify-end">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setConfirmMasivoOpen(true)}
+                disabled={asignandoTodos || loading}
+              >
+                {asignandoTodos ? <Loader2 size={14} className="animate-spin" /> : <Users size={14} />}
+                <span className="ml-1.5">Asignar todos ({disponibles.length})</span>
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Lista actual */}
@@ -171,6 +210,16 @@ export default function GestionarEquipoModal({
         </div>
 
       </div>
+
+      <ConfirmDialog
+        open={confirmMasivoOpen}
+        onClose={() => setConfirmMasivoOpen(false)}
+        onConfirm={asignarTodos}
+        title="Asignación masiva"
+        message={`¿Deseas asignar los ${disponibles.length} ${selectedRol === 'supervisor' ? 'supervisores' : 'ingenieros'} disponibles a este proyecto?`}
+        confirmLabel="Asignar todos"
+        variant="primary"
+      />
     </Modal>
   );
 }

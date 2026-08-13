@@ -43,6 +43,7 @@ export default function EditarProyectoPage() {
   const [selectedSupervisor, setSelectedSupervisor] = useState<string>('');
   const [selectedIngeniero, setSelectedIngeniero] = useState<string>('');
   const [assigning, setAssigning] = useState(false);
+  const [assigningMasivo, setAssigningMasivo] = useState<'supervisor' | 'ingeniero' | null>(null);
 
   // Datos Formulario General
   const [nombre, setNombre] = useState('');
@@ -139,6 +140,35 @@ export default function EditarProyectoPage() {
       toast.error('Error al asignar', err.message || 'No se pudo asignar el usuario');
     } finally {
       setAssigning(false);
+    }
+  };
+
+  // Asignar todos los disponibles de un rol de una sola vez
+  const handleAsignarTodos = async (rol: 'supervisor' | 'ingeniero') => {
+    const lista = rol === 'supervisor' ? supervisoresDisponibles : ingenierosDisponibles;
+    if (lista.length === 0) return;
+    if (!confirm(`¿Deseas asignar los ${lista.length} ${rol === 'supervisor' ? 'supervisores' : 'ingenieros'} disponibles a este proyecto?`)) return;
+
+    setAssigningMasivo(rol);
+    try {
+      const usuarioIds = lista.map((u) => u.id);
+      const resultado = await proyectosService.asignarMasivo(id, usuarioIds, rol);
+      const omitidos = resultado.total - resultado.asignados;
+
+      if (omitidos > 0) {
+        toast.warning('Asignación parcial', `${resultado.asignados} asignados, ${omitidos} omitidos`);
+      } else {
+        toast.success('Personal asignado', `${resultado.asignados} usuarios asignados correctamente`);
+      }
+
+      const proyectoActualizado = await proyectosService.getProyecto(id);
+      setUsuariosAsignados(proyectoActualizado.usuarios || []);
+      await loadDisponibles(id);
+    } catch (err: any) {
+      console.error('Error al asignar usuarios en masa:', err);
+      toast.error('Error al asignar', err.message || 'No se pudo completar la asignación masiva');
+    } finally {
+      setAssigningMasivo(null);
     }
   };
 
@@ -421,6 +451,21 @@ export default function EditarProyectoPage() {
                   <span>Asignar</span>
                 </button>
               </div>
+              {supervisoresDisponibles.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => handleAsignarTodos('supervisor')}
+                  disabled={assigning || assigningMasivo !== null}
+                  className="mt-2 text-xs text-brand-600 hover:underline font-medium inline-flex items-center gap-1 disabled:opacity-50 disabled:no-underline"
+                >
+                  {assigningMasivo === 'supervisor' ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    <Users size={12} />
+                  )}
+                  Asignar todos los {supervisoresDisponibles.length} disponibles
+                </button>
+              )}
             </div>
 
             {/* Select Ingeniero */}
@@ -453,6 +498,21 @@ export default function EditarProyectoPage() {
                   <span>Asignar</span>
                 </button>
               </div>
+              {ingenierosDisponibles.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => handleAsignarTodos('ingeniero')}
+                  disabled={assigning || assigningMasivo !== null}
+                  className="mt-2 text-xs text-brand-600 hover:underline font-medium inline-flex items-center gap-1 disabled:opacity-50 disabled:no-underline"
+                >
+                  {assigningMasivo === 'ingeniero' ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    <Users size={12} />
+                  )}
+                  Asignar todos los {ingenierosDisponibles.length} disponibles
+                </button>
+              )}
             </div>
           </div>
 

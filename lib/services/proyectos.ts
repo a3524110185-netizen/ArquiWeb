@@ -55,6 +55,19 @@ export interface UsuarioProyecto {
   };
 }
 
+export interface AsignacionMasivaDetalle {
+  usuario_id: number;
+  nombre?: string;
+  estado: string;
+  motivo?: string;
+}
+
+export interface AsignacionMasivaResultado {
+  asignados: number;
+  total: number;
+  detalle: AsignacionMasivaDetalle[];
+}
+
 export interface ProyectoApi {
   id: number;
   codigo?: string;
@@ -194,6 +207,24 @@ export const proyectosService = {
       rol: rol
     });
     return response.data || response;
+  },
+
+  // POST /api/proyectos/{id}/asignar-masivo
+  async asignarMasivo(
+    proyectoId: number | string,
+    usuarioIds: (number | string)[],
+    rol?: 'supervisor' | 'ingeniero'
+  ): Promise<AsignacionMasivaResultado> {
+    const response = await api.post<any>(`/proyectos/${proyectoId}/asignar-masivo`, {
+      usuario_ids: usuarioIds.map(Number),
+      ...(rol ? { rol } : {}),
+    });
+    const data = response.data || {};
+    return {
+      asignados: Number(data.asignados ?? 0),
+      total: Number(data.total ?? usuarioIds.length),
+      detalle: Array.isArray(data.detalle) ? data.detalle : [],
+    };
   },
 
   // DELETE /api/proyectos/{id}/usuarios/{usuarioId}
