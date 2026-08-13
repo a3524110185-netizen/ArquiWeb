@@ -5,6 +5,11 @@ export interface RolApi {
   nombre: string;
 }
 
+export interface DepartamentoResumen {
+  id: number;
+  nombre: string;
+}
+
 export interface UsuarioApi {
   id: number;
   nombre: string;
@@ -14,6 +19,8 @@ export interface UsuarioApi {
   activo: boolean;
   rol_id?: number;
   rol?: RolApi;
+  departamento_id?: number | null;
+  departamento?: DepartamentoResumen | null;
   ultimo_acceso?: string | null;
   created_at?: string;
   updated_at?: string;
@@ -25,6 +32,7 @@ export interface UsuarioFormInput {
   password?: string;
   rol_id: number | string;
   telefono?: string;
+  departamento_id?: number | string | null;
 }
 
 // Fallback usado solo si GET /api/roles no está disponible.

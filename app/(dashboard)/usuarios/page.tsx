@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { usuariosService, UsuarioApi, RolApi, UsuarioFormInput } from '@/lib/services/usuarios';
+import { departamentosService, DepartamentoApi } from '@/lib/services/departamentos';
 import { ApiError } from '@/lib/services/api';
 import Card, { CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -14,7 +15,7 @@ import { Plus, Search, Edit2, Trash2, RotateCcw, Loader2, AlertCircle, Users } f
 
 const PER_PAGE = 6;
 
-const emptyForm = { nombre: '', email: '', password: '', telefono: '', rol_id: '' };
+const emptyForm = { nombre: '', email: '', password: '', telefono: '', rol_id: '', departamento_id: '' };
 
 const capitalizar = (s?: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '—');
 
@@ -23,6 +24,7 @@ export default function UsuariosPage() {
 
   const [usuarios, setUsuarios] = useState<UsuarioApi[]>([]);
   const [roles, setRoles] = useState<RolApi[]>([]);
+  const [departamentos, setDepartamentos] = useState<DepartamentoApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,6 +61,7 @@ export default function UsuariosPage() {
 
   useEffect(() => {
     usuariosService.getRoles().then(setRoles);
+    departamentosService.getDepartamentos().then(setDepartamentos).catch(() => {});
   }, []);
 
   const filtered = useMemo(() => usuarios.filter(u => {
@@ -85,7 +88,11 @@ export default function UsuariosPage() {
     setForm(emptyForm); setErrors({}); setEditId(null); setModal('create');
   };
   const openEdit = (u: UsuarioApi) => {
-    setForm({ nombre: u.nombre, email: u.email, password: '', telefono: u.telefono || '', rol_id: String(u.rol?.id ?? u.rol_id ?? '') });
+    setForm({
+      nombre: u.nombre, email: u.email, password: '', telefono: u.telefono || '',
+      rol_id: String(u.rol?.id ?? u.rol_id ?? ''),
+      departamento_id: String(u.departamento?.id ?? u.departamento_id ?? ''),
+    });
     setEditId(u.id); setErrors({}); setModal('edit');
   };
 
@@ -109,6 +116,7 @@ export default function UsuariosPage() {
         email: form.email,
         rol_id: Number(form.rol_id),
         telefono: form.telefono,
+        departamento_id: form.departamento_id ? Number(form.departamento_id) : null,
       };
       if (form.password) payload.password = form.password;
 
@@ -208,7 +216,7 @@ export default function UsuariosPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-default">
-                    {['Usuario', 'Rol', 'Email', 'Teléfono', 'Estado', 'Registrado', ''].map(h => (
+                    {['Usuario', 'Rol', 'Departamento', 'Email', 'Teléfono', 'Estado', 'Registrado', ''].map(h => (
                       <th key={h} className="text-left py-2 px-3 text-xs font-semibold text-secondary first:pl-0">{h}</th>
                     ))}
                   </tr>
@@ -227,6 +235,7 @@ export default function UsuariosPage() {
                           </div>
                         </td>
                         <td className="py-3 px-3"><Badge variant={rolVariant(capitalizar(u.rol?.nombre))}>{capitalizar(u.rol?.nombre)}</Badge></td>
+                        <td className="py-3 px-3 text-xs text-secondary">{u.departamento?.nombre || '—'}</td>
                         <td className="py-3 px-3 text-xs text-secondary max-w-[200px] truncate">{u.email}</td>
                         <td className="py-3 px-3 text-xs text-secondary">{u.telefono || '—'}</td>
                         <td className="py-3 px-3">
@@ -257,7 +266,7 @@ export default function UsuariosPage() {
                   })}
                   {paged.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="py-12 text-center">
+                      <td colSpan={8} className="py-12 text-center">
                         <div className="flex flex-col items-center gap-2 text-muted">
                           <Users size={28} />
                           <p className="text-sm">No hay usuarios registrados</p>
@@ -297,6 +306,10 @@ export default function UsuariosPage() {
           <Select label="Rol" options={roles.map(r => ({ value: String(r.id), label: capitalizar(r.nombre) }))}
             value={form.rol_id} onChange={e => f('rol_id', e.target.value)}
             error={errors.rol_id} placeholder="Selecciona un rol" />
+          <Select label="Departamento"
+            options={[{ value: '', label: 'Sin departamento' }, ...departamentos.map(d => ({ value: String(d.id), label: d.nombre }))]}
+            value={form.departamento_id} onChange={e => f('departamento_id', e.target.value)}
+            error={errors.departamento_id} />
         </div>
       </Modal>
 
