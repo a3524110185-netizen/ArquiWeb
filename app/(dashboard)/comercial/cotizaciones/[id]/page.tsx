@@ -73,7 +73,7 @@ export default function DetalleCotizacionPage() {
   if (loading) {
     return (
       <div className="py-16 flex flex-col items-center justify-center gap-3">
-        <Loader2 size={28} className="animate-spin text-brand-600" />
+        <Loader2 size={28} className="animate-spin text-sigo-primary" />
         <p className="text-sm text-muted">Cargando cotización...</p>
       </div>
     );
@@ -84,7 +84,7 @@ export default function DetalleCotizacionPage() {
       <div className="py-16 text-center space-y-3">
         <AlertCircle className="text-red-500 mx-auto" size={36} />
         <p className="text-sm font-medium text-red-500">{error || 'Cotización no encontrada'}</p>
-        <button onClick={cargar} className="text-sm text-brand-600 hover:underline font-medium">Reintentar</button>
+        <button onClick={cargar} className="text-sm text-sigo-primary hover:underline font-medium">Reintentar</button>
       </div>
     );
   }
@@ -100,7 +100,7 @@ export default function DetalleCotizacionPage() {
           </button>
           <div>
             <h1 className="text-xl font-bold text-primary flex items-center gap-2">
-              <FileText className="text-brand-600" size={22} /> {cotizacion.folio}
+              <FileText className="text-sigo-primary" size={22} /> {cotizacion.folio}
             </h1>
             <p className="text-xs text-muted">{formatDate(cotizacion.fecha)}</p>
           </div>

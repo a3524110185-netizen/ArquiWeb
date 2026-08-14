@@ -24,13 +24,13 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 
 const icons = { success: CheckCircle, error: XCircle, warning: AlertTriangle, info: Info };
 const styles: Record<ToastType, string> = {
-  success: 'border-emerald-400 bg-emerald-50 dark:bg-emerald-900/20',
-  error: 'border-red-400 bg-red-50 dark:bg-red-900/20',
-  warning: 'border-amber-400 bg-amber-50 dark:bg-amber-900/20',
-  info: 'border-brand-400 bg-brand-50 dark:bg-brand-900/20',
+  success: 'border-sigo-success bg-sigo-success/10 dark:bg-sigo-success/15',
+  error: 'border-sigo-error bg-sigo-error/10 dark:bg-sigo-error/15',
+  warning: 'border-sigo-warning bg-sigo-warning/10 dark:bg-sigo-warning/15',
+  info: 'border-sigo-info bg-sigo-info/10 dark:bg-sigo-info/15',
 };
 const iconColors = {
-  success: 'text-emerald-500', error: 'text-red-500', warning: 'text-amber-500', info: 'text-brand-500',
+  success: 'text-sigo-success', error: 'text-sigo-error', warning: 'text-sigo-warning', info: 'text-sigo-info',
 };
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {

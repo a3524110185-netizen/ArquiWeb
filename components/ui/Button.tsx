@@ -10,12 +10,12 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', loading, children, disabled, ...props }, ref) => {
-    const base = 'inline-flex items-center gap-2 font-medium rounded-lg transition-all duration-200 cursor-pointer border-0 outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+    const base = 'inline-flex items-center gap-2 font-medium rounded-lg transition-all duration-200 cursor-pointer border-0 outline-none focus-visible:ring-2 focus-visible:ring-sigo-primary focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
     const variants = {
-      primary: 'bg-brand-600 text-white hover:bg-brand-700 hover:-translate-y-px hover:shadow-lg hover:shadow-brand-600/30',
-      secondary: 'bg-card text-primary border border-default hover:border-brand-600 hover:text-brand-600',
-      danger: 'bg-red-500 text-white hover:bg-red-600',
-      success: 'bg-emerald-500 text-white hover:bg-emerald-600',
+      primary: 'bg-sigo-primary text-white hover:bg-sigo-primary-light hover:-translate-y-px hover:shadow-lg hover:shadow-sigo-primary/30',
+      secondary: 'bg-card text-primary border border-default hover:border-sigo-primary hover:text-sigo-primary',
+      danger: 'bg-sigo-error text-white hover:brightness-90',
+      success: 'bg-sigo-success text-white hover:brightness-90',
       ghost: 'text-secondary hover:text-primary hover:bg-app',
     };
     const sizes = {

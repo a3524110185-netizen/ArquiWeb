@@ -74,7 +74,7 @@ export default function DashboardSuperadminPage() {
   if (isLoading || !currentUser || currentUser.rol.nombre !== 'superadmin') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <Loader2 size={32} className="animate-spin text-brand-500" />
+        <Loader2 size={32} className="animate-spin text-sigo-primary" />
       </div>
     );
   }
@@ -93,7 +93,7 @@ export default function DashboardSuperadminPage() {
         <Card className="p-8 text-center space-y-3 border-red-200 dark:border-red-900/30">
           <AlertCircle className="text-red-500 mx-auto" size={32} />
           <p className="text-sm font-medium text-red-500">{error}</p>
-          <button onClick={fetchStats} className="text-sm text-brand-600 hover:underline font-medium inline-flex items-center gap-1.5">
+          <button onClick={fetchStats} className="text-sm text-sigo-primary hover:underline font-medium inline-flex items-center gap-1.5">
             <RefreshCw size={14} /> Reintentar
           </button>
         </Card>
@@ -102,7 +102,7 @@ export default function DashboardSuperadminPage() {
           {/* KPIs */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="p-5 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-brand-50 dark:bg-brand-900/20 text-brand-600 flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-xl bg-sigo-primary/10 dark:bg-sigo-primary/20 text-sigo-primary flex items-center justify-center shrink-0">
                 <Building2 size={24} />
               </div>
               <div>

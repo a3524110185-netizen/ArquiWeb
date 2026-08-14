@@ -34,7 +34,7 @@ export default function Tabs({ tabs, activeTab, onChange, variant = 'underline',
                 ? cn(
                   'px-4 py-2.5 border-b-2 -mb-px',
                   tab.id === activeTab
-                    ? 'border-brand-600 text-brand-600'
+                    ? 'border-sigo-primary text-sigo-primary'
                     : 'border-transparent text-secondary hover:text-primary hover:border-slate-300'
                 )
                 : cn(
@@ -50,7 +50,7 @@ export default function Tabs({ tabs, activeTab, onChange, variant = 'underline',
             {tab.badge !== undefined && (
               <span className={cn(
                 'px-1.5 py-0.5 rounded-full text-xs font-semibold',
-                tab.id === activeTab ? 'bg-brand-600 text-white' : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
+                tab.id === activeTab ? 'bg-sigo-primary text-white' : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
               )}>
                 {tab.badge}
               </span>

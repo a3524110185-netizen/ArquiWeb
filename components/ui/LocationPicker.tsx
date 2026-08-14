@@ -205,7 +205,7 @@ export default function LocationPicker({ ubicacion, latitud, longitud, onChange 
                     focusedIndex === i ? 'bg-app text-primary' : 'text-secondary hover:bg-app hover:text-primary'
                   }`}
                 >
-                  <MapPin size={16} className={`shrink-0 mt-0.5 ${focusedIndex === i ? 'text-brand-500' : 'text-muted'}`} />
+                  <MapPin size={16} className={`shrink-0 mt-0.5 ${focusedIndex === i ? 'text-sigo-primary' : 'text-muted'}`} />
                   <span className="line-clamp-2">{s.display_name}</span>
                 </button>
               ))

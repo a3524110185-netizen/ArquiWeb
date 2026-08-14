@@ -111,7 +111,7 @@ export default function ReporteHorasPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
-            <BarChart3 className="text-brand-600" size={26} /> Reporte de Horas
+            <BarChart3 className="text-sigo-primary" size={26} /> Reporte de Horas
           </h1>
           <p className="text-sm text-muted">Resumen de horas trabajadas, extras y faltas por trabajador</p>
         </div>
@@ -166,14 +166,14 @@ export default function ReporteHorasPage() {
       <Card className="overflow-hidden" padding="none">
         {loading ? (
           <div className="py-16 flex flex-col items-center justify-center gap-3">
-            <Loader2 size={28} className="animate-spin text-brand-600" />
+            <Loader2 size={28} className="animate-spin text-sigo-primary" />
             <p className="text-sm text-muted">Cargando reporte...</p>
           </div>
         ) : error ? (
           <div className="py-12 text-center space-y-3">
             <AlertCircle className="text-red-500 mx-auto" size={36} />
             <p className="text-sm font-medium text-red-500">{error}</p>
-            <button onClick={cargarReporte} className="text-sm text-brand-600 hover:underline font-medium">Reintentar</button>
+            <button onClick={cargarReporte} className="text-sm text-sigo-primary hover:underline font-medium">Reintentar</button>
           </div>
         ) : resumen.length === 0 ? (
           <div className="py-16 text-center flex flex-col items-center gap-2">
@@ -211,9 +211,9 @@ export default function ReporteHorasPage() {
                       </tr>
                       {isExpanded && (
                         <tr>
-                          <td colSpan={5} className="p-0 bg-app/50 border-b-2 border-brand-100 dark:border-brand-900/40">
+                          <td colSpan={5} className="p-0 bg-app/50 border-b-2 border-sigo-primary/10 dark:border-sigo-primary/40">
                             {detalleLoading === row.usuario.id ? (
-                              <div className="py-8 flex justify-center"><Loader2 size={20} className="animate-spin text-brand-600" /></div>
+                              <div className="py-8 flex justify-center"><Loader2 size={20} className="animate-spin text-sigo-primary" /></div>
                             ) : (
                               <div className="p-4 overflow-x-auto">
                                 <table className="w-full text-xs">

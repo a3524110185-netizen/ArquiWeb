@@ -62,7 +62,7 @@ export default function CategoriasPage() {
 
         <div className="space-y-2">
           {categorias.map(cat => (
-            <div key={cat.id} className="flex items-center justify-between p-3 rounded-xl border border-default bg-app hover:border-brand-300 transition-colors">
+            <div key={cat.id} className="flex items-center justify-between p-3 rounded-xl border border-default bg-app hover:border-sigo-primary-light transition-colors">
               <div className="flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center bg-${cat.color}-100 text-${cat.color}-600 dark:bg-${cat.color}-900/30`}>
                   <Tag size={14} />

@@ -41,7 +41,7 @@ export default function DetalleVentaPage() {
   if (loading) {
     return (
       <div className="py-16 flex flex-col items-center justify-center gap-3">
-        <Loader2 size={28} className="animate-spin text-brand-600" />
+        <Loader2 size={28} className="animate-spin text-sigo-primary" />
         <p className="text-sm text-muted">Cargando venta...</p>
       </div>
     );
@@ -53,7 +53,7 @@ export default function DetalleVentaPage() {
         <AlertCircle className="text-red-500 mx-auto" size={36} />
         <p className="text-sm font-medium text-red-500">{error || 'Venta no encontrada'}</p>
         <div className="flex items-center justify-center gap-4">
-          <button onClick={cargar} className="text-sm text-brand-600 hover:underline font-medium">Reintentar</button>
+          <button onClick={cargar} className="text-sm text-sigo-primary hover:underline font-medium">Reintentar</button>
           <button onClick={() => router.push('/comercial/ventas')} className="text-sm text-secondary hover:underline font-medium">Volver al listado</button>
         </div>
       </div>
@@ -71,7 +71,7 @@ export default function DetalleVentaPage() {
           </button>
           <div>
             <h1 className="text-xl font-bold text-primary flex items-center gap-2">
-              <BarChart3 className="text-brand-600" size={22} /> {venta.folio}
+              <BarChart3 className="text-sigo-primary" size={22} /> {venta.folio}
             </h1>
             <p className="text-xs text-muted">{formatDate(venta.fecha)}</p>
           </div>
@@ -188,9 +188,9 @@ export default function DetalleVentaPage() {
         <Card>
           {venta.cotizacion && (
             <p className="text-sm text-secondary flex items-center gap-1.5 mb-2">
-              <FileText size={14} className="text-brand-600" />
+              <FileText size={14} className="text-sigo-primary" />
               Esta venta fue generada desde la cotización{' '}
-              <Link href={`/comercial/cotizaciones/${venta.cotizacion.id}`} className="text-brand-600 hover:underline font-medium">
+              <Link href={`/comercial/cotizaciones/${venta.cotizacion.id}`} className="text-sigo-primary hover:underline font-medium">
                 {venta.cotizacion.folio}
               </Link>
             </p>

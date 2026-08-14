@@ -42,7 +42,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-app">
-        <Loader2 size={40} className="animate-spin text-brand-500" />
+        <Loader2 size={40} className="animate-spin text-sigo-primary" />
       </div>
     );
   }

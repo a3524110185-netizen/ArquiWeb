@@ -81,9 +81,9 @@ const styles = StyleSheet.create({
   colHora: { flex: 1 },
   colHoras: { flex: 0.8 },
   colEstado: { flex: 1.1 },
-  estadoCompleto: { color: '#10B981', fontFamily: 'Helvetica-Bold' },
-  estadoIncompleto: { color: '#F59E0B', fontFamily: 'Helvetica-Bold' },
-  estadoFalta: { color: '#EF4444', fontFamily: 'Helvetica-Bold' },
+  estadoCompleto: { color: '#2E7D32', fontFamily: 'Helvetica-Bold' },
+  estadoIncompleto: { color: '#F57F17', fontFamily: 'Helvetica-Bold' },
+  estadoFalta: { color: '#C62828', fontFamily: 'Helvetica-Bold' },
   footer: {
     position: 'absolute',
     bottom: 16,

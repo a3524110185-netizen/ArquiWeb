@@ -18,7 +18,7 @@ export default function SuperadminLayout({ children }: { children: React.ReactNo
   if (isLoading || !currentUser || currentUser.rol.nombre !== 'superadmin') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <Loader2 size={32} className="animate-spin text-brand-500" />
+        <Loader2 size={32} className="animate-spin text-sigo-primary" />
       </div>
     );
   }

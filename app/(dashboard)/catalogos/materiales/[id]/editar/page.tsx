@@ -98,7 +98,7 @@ export default function EditarMaterialPage() {
   if (loading) {
     return (
       <div className="py-16 flex flex-col items-center justify-center gap-3">
-        <Loader2 size={28} className="animate-spin text-brand-600" />
+        <Loader2 size={28} className="animate-spin text-sigo-primary" />
         <p className="text-sm text-muted">Cargando material...</p>
       </div>
     );
@@ -109,7 +109,7 @@ export default function EditarMaterialPage() {
       <div className="py-16 text-center space-y-3">
         <AlertCircle className="text-red-500 mx-auto" size={36} />
         <p className="text-sm font-medium text-red-500">{error}</p>
-        <button onClick={cargar} className="text-sm text-brand-600 hover:underline font-medium">Reintentar</button>
+        <button onClick={cargar} className="text-sm text-sigo-primary hover:underline font-medium">Reintentar</button>
       </div>
     );
   }
@@ -122,7 +122,7 @@ export default function EditarMaterialPage() {
         </button>
         <div>
           <h1 className="text-xl font-bold text-primary flex items-center gap-2">
-            <Package className="text-brand-600" size={22} /> Editar Material
+            <Package className="text-sigo-primary" size={22} /> Editar Material
           </h1>
           <p className="text-xs text-muted">{form.codigo}</p>
         </div>

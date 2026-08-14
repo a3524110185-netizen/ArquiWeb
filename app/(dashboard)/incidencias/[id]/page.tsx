@@ -49,10 +49,10 @@ function normalizeSeveridad(s: string) {
 }
 
 const borderBySeveridad: Record<string, string> = {
-  'Crítica': '#EF4444', 'critica': '#EF4444',
-  'Alta': '#F59E0B', 'alta': '#F59E0B',
-  'Media': '#0EA5E9', 'media': '#0EA5E9',
-  'Baja': '#10B981', 'baja': '#10B981',
+  'Crítica': '#C62828', 'critica': '#C62828',
+  'Alta': '#F57F17', 'alta': '#F57F17',
+  'Media': '#3B82F6', 'media': '#3B82F6',
+  'Baja': '#2E7D32', 'baja': '#2E7D32',
 };
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
@@ -237,11 +237,11 @@ export default function IncidenciaDetallePage() {
             </div>
             <p className="text-sm font-medium">
               {inc.proyecto_id ? (
-                <Link href={`/proyectos/${inc.proyecto_id}`} className="text-brand-600 hover:underline">
+                <Link href={`/proyectos/${inc.proyecto_id}`} className="text-sigo-primary hover:underline">
                   {proyectoCodigo ? `${proyectoCodigo} · ` : ''}{proyecto}
                 </Link>
               ) : (
-                <span className="text-brand-600">
+                <span className="text-sigo-primary">
                   {proyectoCodigo ? `${proyectoCodigo} · ` : ''}{proyecto}
                 </span>
               )}
@@ -330,7 +330,7 @@ export default function IncidenciaDetallePage() {
                       {idx !== timeline.length - 1 && (
                         <div className="absolute left-2 top-6 bottom-0 w-px bg-border" />
                       )}
-                      <div className="w-4 h-4 rounded-full bg-brand-100 border-2 border-brand-500 shrink-0 mt-1 z-10" />
+                      <div className="w-4 h-4 rounded-full bg-sigo-primary/10 border-2 border-sigo-primary shrink-0 mt-1 z-10" />
                       <div className="pb-5">
                         <p className="text-sm font-medium text-primary">{accion}</p>
                         <div className="flex items-center gap-3 mt-1 flex-wrap">
@@ -418,7 +418,7 @@ export default function IncidenciaDetallePage() {
 
         {/* Columna lateral: Acciones */}
         <div className="space-y-6">
-          <Card className="border-brand-200 bg-brand-50/30 dark:bg-brand-900/10">
+          <Card className="border-sigo-primary/20 bg-sigo-primary/5 dark:bg-sigo-primary/10">
             <CardHeader>
               <CardTitle>Acciones</CardTitle>
             </CardHeader>

@@ -190,7 +190,7 @@ export default function NuevaVentaDirectaPage() {
   if (loadingClientes) {
     return (
       <div className="py-16 flex flex-col items-center justify-center gap-3">
-        <Loader2 size={28} className="animate-spin text-brand-600" />
+        <Loader2 size={28} className="animate-spin text-sigo-primary" />
         <p className="text-sm text-muted">Cargando datos...</p>
       </div>
     );
@@ -204,7 +204,7 @@ export default function NuevaVentaDirectaPage() {
         </button>
         <div>
           <h1 className="text-xl font-bold text-primary flex items-center gap-2">
-            <ShoppingCart className="text-brand-600" size={22} /> Nueva Venta Directa
+            <ShoppingCart className="text-sigo-primary" size={22} /> Nueva Venta Directa
           </h1>
           <p className="text-xs text-muted">Registra una venta de mostrador sin cotización previa</p>
         </div>

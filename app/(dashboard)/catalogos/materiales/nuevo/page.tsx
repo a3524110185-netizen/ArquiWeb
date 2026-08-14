@@ -78,7 +78,7 @@ export default function NuevoMaterialPage() {
         </Link>
         <div>
           <h1 className="text-xl font-bold text-primary flex items-center gap-2">
-            <Package className="text-brand-600" size={22} /> Nuevo Material
+            <Package className="text-sigo-primary" size={22} /> Nuevo Material
           </h1>
           <p className="text-xs text-muted">Agrega un material al catálogo</p>
         </div>

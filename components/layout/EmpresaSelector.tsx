@@ -66,7 +66,7 @@ export default function EmpresaSelector() {
           <button
             onClick={() => setShowCrearModal(true)}
             title="Nueva Empresa"
-            className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-app border border-default text-xs text-secondary font-medium hover:text-primary hover:border-brand-600 transition-colors"
+            className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-app border border-default text-xs text-secondary font-medium hover:text-primary hover:border-sigo-primary transition-colors"
           >
             <Plus size={12} className="shrink-0" />
             <span className="hidden sm:inline">Nueva Empresa</span>
@@ -97,7 +97,7 @@ export default function EmpresaSelector() {
       <button
         onClick={() => setOpen(o => !o)}
         disabled={loading}
-        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-app border border-default text-xs text-secondary font-medium hover:text-primary hover:border-brand-600 transition-colors disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-app border border-default text-xs text-secondary font-medium hover:text-primary hover:border-sigo-primary transition-colors disabled:opacity-50"
       >
         {loading ? <Loader2 size={12} className="animate-spin" /> : <Building2 size={12} />}
         <span className="max-w-[140px] truncate">{currentUser.empresa_actual.nombre}</span>
@@ -123,7 +123,7 @@ export default function EmpresaSelector() {
                 >
                   <Building2 size={14} className="shrink-0 text-muted" />
                   <span className="flex-1 truncate">{e.nombre}</span>
-                  {isActual && <Check size={14} className="text-brand-600 shrink-0" />}
+                  {isActual && <Check size={14} className="text-sigo-primary shrink-0" />}
                 </button>
               );
             })}
@@ -131,7 +131,7 @@ export default function EmpresaSelector() {
           <div className="border-t border-default">
             <button
               onClick={() => { setOpen(false); setShowCrearModal(true); }}
-              className="w-full flex items-center gap-2 px-4 py-2.5 text-left text-xs font-medium text-brand-600 hover:bg-app transition-colors"
+              className="w-full flex items-center gap-2 px-4 py-2.5 text-left text-xs font-medium text-sigo-primary hover:bg-app transition-colors"
             >
               <Plus size={14} className="shrink-0" />
               Crear Empresa

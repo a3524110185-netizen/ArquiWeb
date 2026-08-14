@@ -79,7 +79,7 @@ export default function GaleriaEvidenciasPage() {
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
-            <ImageIcon size={24} className="text-brand-600" /> Galería de Evidencias
+            <ImageIcon size={24} className="text-sigo-primary" /> Galería de Evidencias
           </h1>
           <p className="text-sm text-muted mt-0.5">Fotografías y respaldos visuales de obra</p>
         </div>
@@ -170,7 +170,7 @@ export default function GaleriaEvidenciasPage() {
               <button
                 key={evidencia.id}
                 onClick={() => setFotoModal(evidencia)}
-                className="group relative aspect-square rounded-2xl overflow-hidden border border-default hover:border-brand-400 transition-all shadow-sm hover:shadow-md">
+                className="group relative aspect-square rounded-2xl overflow-hidden border border-default hover:border-sigo-primary-light transition-all shadow-sm hover:shadow-md">
                 <img
                   src={resolveMediaUrl(evidencia.url)}
                   alt={evidencia.descripcion || 'Evidencia'}

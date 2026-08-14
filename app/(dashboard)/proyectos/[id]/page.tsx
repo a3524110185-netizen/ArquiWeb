@@ -182,7 +182,7 @@ export default function ProyectoDetallePage() {
   if (loading) {
     return (
       <div className="p-16 text-center flex flex-col items-center justify-center gap-3">
-        <Loader2 size={36} className="animate-spin text-brand-600" />
+        <Loader2 size={36} className="animate-spin text-sigo-primary" />
         <p className="text-sm font-medium text-secondary">Cargando proyecto...</p>
       </div>
     );
@@ -242,7 +242,7 @@ export default function ProyectoDetallePage() {
             )}
             <div className="space-y-1 min-w-0">
               <div className="flex items-center gap-3 flex-wrap">
-                <span className="font-mono text-xs font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/30 px-2 py-0.5 rounded">
+                <span className="font-mono text-xs font-bold text-sigo-primary dark:text-sigo-primary-light bg-sigo-primary/10 dark:bg-sigo-primary/30 px-2 py-0.5 rounded">
                   {proyecto.codigo || `PRJ-${proyecto.id}`}
                 </span>
                 <Badge variant={proyectoEstadoVariant(proyecto.estado)} dot size="md">
@@ -255,7 +255,7 @@ export default function ProyectoDetallePage() {
               )}
               <div className="flex items-center gap-4 pt-2 text-xs text-muted flex-wrap">
                 <span className="flex items-center gap-1">
-                  <MapPin size={14} className="text-brand-500" /> {proyecto.ubicacion}
+                  <MapPin size={14} className="text-sigo-primary" /> {proyecto.ubicacion}
                 </span>
                 {proyecto.cliente?.nombre && (
                   <span className="flex items-center gap-1">
@@ -273,9 +273,9 @@ export default function ProyectoDetallePage() {
           {/* Medidor de avance */}
           <div className="w-full lg:w-48 bg-app p-4 rounded-2xl border border-default text-center shrink-0">
             <p className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">Avance Físico</p>
-            <div className="text-3xl font-extrabold text-brand-600 dark:text-brand-400">{avanceFisico}%</div>
+            <div className="text-3xl font-extrabold text-sigo-primary dark:text-sigo-primary-light">{avanceFisico}%</div>
             <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full mt-2 overflow-hidden">
-              <div className="h-full bg-brand-600 rounded-full transition-all duration-700"
+              <div className="h-full bg-sigo-primary rounded-full transition-all duration-700"
                 style={{ width: `${Math.min(100, Math.max(0, avanceFisico))}%` }} />
             </div>
           </div>
@@ -285,7 +285,7 @@ export default function ProyectoDetallePage() {
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-brand-50 dark:bg-brand-900/20 text-brand-600 flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-sigo-primary/10 dark:bg-sigo-primary/20 text-sigo-primary flex items-center justify-center shrink-0">
             <TrendingUp size={24} />
           </div>
           <div>
@@ -335,7 +335,7 @@ export default function ProyectoDetallePage() {
       <Card>
         <CardHeader className="flex items-center gap-2">
           <CardTitle className="flex items-center gap-2">
-            <FileText size={18} className="text-brand-600" /> Historial de Avances
+            <FileText size={18} className="text-sigo-primary" /> Historial de Avances
           </CardTitle>
         </CardHeader>
         <div className="overflow-x-auto">
@@ -372,7 +372,7 @@ export default function ProyectoDetallePage() {
                           {typeof r.usuario === 'object' ? r.usuario?.nombre : (r.supervisor || '—')}
                         </td>
                         <td className="py-3 px-3">
-                          <span className="text-xs font-semibold text-brand-600">{avance}%</span>
+                          <span className="text-xs font-semibold text-sigo-primary">{avance}%</span>
                         </td>
                         <td className="py-3 px-3 text-xs text-secondary">{r.categoria || '—'}</td>
                         <td className="py-3 px-3 text-xs text-secondary max-w-[200px]">
@@ -476,7 +476,7 @@ export default function ProyectoDetallePage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Activity size={18} className="text-brand-600" /> Actividad Reciente
+            <Activity size={18} className="text-sigo-primary" /> Actividad Reciente
           </CardTitle>
         </CardHeader>
         {loadingReportes ? (
@@ -500,12 +500,12 @@ export default function ProyectoDetallePage() {
                 {idx !== actividad.length - 1 && (
                   <div className="absolute left-2 top-6 bottom-0 w-px bg-border" />
                 )}
-                <div className="w-4 h-4 rounded-full bg-brand-100 border-2 border-brand-500 shrink-0 mt-1 z-10" />
+                <div className="w-4 h-4 rounded-full bg-sigo-primary/10 border-2 border-sigo-primary shrink-0 mt-1 z-10" />
                 <div className="pb-5">
                   <p className="text-sm font-medium text-primary">{a.descripcion}</p>
                   <div className="flex items-center gap-3 mt-1">
                     {a.tipo && (
-                      <span className="text-[10px] uppercase tracking-wider font-semibold text-brand-600 bg-brand-50 dark:bg-brand-900/20 px-1.5 py-0.5 rounded">
+                      <span className="text-[10px] uppercase tracking-wider font-semibold text-sigo-primary bg-sigo-primary/10 dark:bg-sigo-primary/20 px-1.5 py-0.5 rounded">
                         {a.tipo}
                       </span>
                     )}
@@ -529,13 +529,13 @@ export default function ProyectoDetallePage() {
       <Card className="p-6">
         <CardHeader className="p-0 pb-4 border-b border-default flex items-center justify-between">
           <CardTitle className="text-base flex items-center gap-2">
-            <Users size={18} className="text-brand-600" />
+            <Users size={18} className="text-sigo-primary" />
             Personal Asignado ({usuariosAsignados.length})
           </CardTitle>
           {isAdmin && (
             <button 
               onClick={() => setEquipoModalOpen(true)}
-              className="text-xs text-brand-600 hover:underline font-medium cursor-pointer bg-transparent border-none p-0">
+              className="text-xs text-sigo-primary hover:underline font-medium cursor-pointer bg-transparent border-none p-0">
               Gestionar Equipo
             </button>
           )}

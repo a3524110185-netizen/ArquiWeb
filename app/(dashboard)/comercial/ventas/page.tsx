@@ -59,7 +59,7 @@ export default function VentasPage() {
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
-            <BarChart3 className="text-brand-600" size={26} /> Ventas
+            <BarChart3 className="text-sigo-primary" size={26} /> Ventas
           </h1>
           <p className="text-sm text-muted">Registro y seguimiento de ventas</p>
         </div>
@@ -89,14 +89,14 @@ export default function VentasPage() {
       <Card padding="none" className="overflow-hidden">
         {loading ? (
           <div className="py-16 flex flex-col items-center justify-center gap-3">
-            <Loader2 size={28} className="animate-spin text-brand-600" />
+            <Loader2 size={28} className="animate-spin text-sigo-primary" />
             <p className="text-sm text-muted">Cargando ventas...</p>
           </div>
         ) : error ? (
           <div className="py-12 text-center space-y-3">
             <AlertCircle className="text-red-500 mx-auto" size={36} />
             <p className="text-sm font-medium text-red-500">{error}</p>
-            <button onClick={cargarVentas} className="text-sm text-brand-600 hover:underline font-medium">Reintentar</button>
+            <button onClick={cargarVentas} className="text-sm text-sigo-primary hover:underline font-medium">Reintentar</button>
           </div>
         ) : (
           <>

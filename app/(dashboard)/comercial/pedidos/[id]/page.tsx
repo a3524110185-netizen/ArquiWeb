@@ -81,7 +81,7 @@ export default function DetallePedidoPage() {
   if (loading) {
     return (
       <div className="py-16 flex flex-col items-center justify-center gap-3">
-        <Loader2 size={28} className="animate-spin text-brand-600" />
+        <Loader2 size={28} className="animate-spin text-sigo-primary" />
         <p className="text-sm text-muted">Cargando pedido...</p>
       </div>
     );
@@ -93,7 +93,7 @@ export default function DetallePedidoPage() {
         <AlertCircle className="text-red-500 mx-auto" size={36} />
         <p className="text-sm font-medium text-red-500">{error || 'Pedido no encontrado'}</p>
         <div className="flex items-center justify-center gap-4">
-          <button onClick={cargar} className="text-sm text-brand-600 hover:underline font-medium">Reintentar</button>
+          <button onClick={cargar} className="text-sm text-sigo-primary hover:underline font-medium">Reintentar</button>
           <button onClick={() => router.push('/comercial/pedidos')} className="text-sm text-secondary hover:underline font-medium">Volver al listado</button>
         </div>
       </div>
@@ -112,7 +112,7 @@ export default function DetallePedidoPage() {
           </button>
           <div>
             <h1 className="text-xl font-bold text-primary flex items-center gap-2">
-              <ShoppingCart className="text-brand-600" size={22} /> {pedido.folio}
+              <ShoppingCart className="text-sigo-primary" size={22} /> {pedido.folio}
             </h1>
             <p className="text-xs text-muted">{formatDate(pedido.fecha_pedido)}</p>
           </div>

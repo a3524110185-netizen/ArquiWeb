@@ -117,7 +117,7 @@ export default function Header() {
           >
             <Bell size={18} />
             {unread > 0 && (
-              <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse-soft">
+              <span className="absolute top-1 right-1 w-4 h-4 bg-sigo-error text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse-soft">
                 {unread}
               </span>
             )}
@@ -127,7 +127,7 @@ export default function Header() {
             <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-default rounded-xl shadow-xl z-50 fade-in">
               <div className="px-4 py-3 border-b border-default flex items-center justify-between">
                 <p className="text-sm font-semibold text-primary">Notificaciones</p>
-                <span className="text-xs text-brand-600 font-medium">{unread} sin leer</span>
+                <span className="text-xs text-sigo-primary font-medium">{unread} sin leer</span>
               </div>
               <div className="max-h-72 overflow-y-auto scrollbar-thin">
                 {notificaciones.map(n => (
@@ -136,15 +136,15 @@ export default function Header() {
                     onClick={() => marcarNotificacionLeida(n.id)}
                     className={cn(
                       'px-4 py-3 border-b border-default last:border-0 cursor-pointer hover:bg-app transition-colors',
-                      !n.leida && 'bg-brand-50 dark:bg-brand-900/10'
+                      !n.leida && 'bg-sigo-primary/5 dark:bg-sigo-primary/10'
                     )}
                   >
                     <div className="flex items-start gap-2">
                       <div className={cn('w-2 h-2 rounded-full mt-1.5 shrink-0', {
-                        'bg-red-500': n.tipo === 'error',
-                        'bg-amber-500': n.tipo === 'warning',
-                        'bg-brand-500': n.tipo === 'info',
-                        'bg-emerald-500': n.tipo === 'success',
+                        'bg-sigo-error': n.tipo === 'error',
+                        'bg-sigo-warning': n.tipo === 'warning',
+                        'bg-sigo-info': n.tipo === 'info',
+                        'bg-sigo-success': n.tipo === 'success',
                       })} />
                       <div>
                         <p className="text-xs font-semibold text-primary">{n.titulo}</p>
@@ -175,7 +175,7 @@ export default function Header() {
           <EmpresaSelector />
           <button
             onClick={handleLogout}
-            className="ml-1 p-1.5 rounded-lg text-secondary hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+            className="ml-1 p-1.5 rounded-lg text-secondary hover:text-sigo-error hover:bg-sigo-error/10 dark:hover:bg-sigo-error/15 transition-colors"
             title="Cerrar sesión"
           >
             <LogOut size={15} />

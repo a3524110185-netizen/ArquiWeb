@@ -133,14 +133,14 @@ export default function InventarioPage() {
 
         {loading ? (
           <div className="py-16 flex flex-col items-center justify-center gap-3">
-            <Loader2 size={28} className="animate-spin text-brand-600" />
+            <Loader2 size={28} className="animate-spin text-sigo-primary" />
             <p className="text-sm text-muted">Cargando inventario...</p>
           </div>
         ) : error ? (
           <div className="py-12 text-center space-y-3">
             <AlertCircle className="text-red-500 mx-auto" size={36} />
             <p className="text-sm font-medium text-red-500">{error}</p>
-            <button onClick={cargarInventario} className="text-sm text-brand-600 hover:underline font-medium">Reintentar</button>
+            <button onClick={cargarInventario} className="text-sm text-sigo-primary hover:underline font-medium">Reintentar</button>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -183,7 +183,7 @@ export default function InventarioPage() {
           <CardTitle>Últimos Movimientos</CardTitle>
         </CardHeader>
         {loadingHistorial ? (
-          <div className="py-8 flex justify-center"><Loader2 size={20} className="animate-spin text-brand-600" /></div>
+          <div className="py-8 flex justify-center"><Loader2 size={20} className="animate-spin text-sigo-primary" /></div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

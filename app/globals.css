@@ -1,23 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-50: #EFF6FF;
-  --color-brand-100: #DBEAFE;
-  --color-brand-200: #BFDBFE;
-  --color-brand-300: #93C5FD;
-  --color-brand-400: #60A5FA;
-  --color-brand-500: #3B82F6;
-  --color-brand-600: #2563EB;
-  --color-brand-700: #1D4ED8;
-  --color-brand-800: #1E40AF;
-  --color-brand-900: #1E3A8A;
-  --color-brand-950: #172554;
-
-  --color-accent: #0EA5E9;
-  --color-accent-dark: #0284C7;
-
-  --color-surface: #F8FAFC;
-  --color-surface-dark: #0F172A;
+  --color-sigo-primary: #1A237E;
+  --color-sigo-primary-light: #3949AB;
+  --color-sigo-accent: #FF6D00;
+  --color-sigo-accent-light: #FF9100;
+  --color-sigo-success: #2E7D32;
+  --color-sigo-warning: #F57F17;
+  --color-sigo-error: #C62828;
+  --color-sigo-info: #3B82F6;
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
@@ -27,14 +18,14 @@
 
 @layer base {
   :root {
-    --bg: #F8FAFC;
+    --bg: #F5F5F5;
     --bg-card: #FFFFFF;
     --bg-sidebar: #FFFFFF;
-    --text-primary: #0F172A;
-    --text-secondary: #475569;
+    --text-primary: #212121;
+    --text-secondary: #757575;
     --text-muted: #94A3B8;
-    --border: #E2E8F0;
-    --border-focus: #2563EB;
+    --border: #E0E0E0;
+    --border-focus: #1A237E;
     --shadow-color: rgba(0, 0, 0, 0.06);
 
     /* Colores categóricos para gráficas (orden fijo, no ciclar) */
@@ -47,14 +38,19 @@
   }
 
   .dark {
-    --bg: #0F172A;
-    --bg-card: #1E293B;
-    --bg-sidebar: #1E293B;
-    --text-primary: #F1F5F9;
-    --text-secondary: #94A3B8;
+    --color-sigo-primary: #3949AB;
+    --color-sigo-success: #10B981;
+    --color-sigo-warning: #F59E0B;
+    --color-sigo-info: #60A5FA;
+
+    --bg: #121212;
+    --bg-card: #1E1E2E;
+    --bg-sidebar: #1E1E2E;
+    --text-primary: #E8E8E8;
+    --text-secondary: #9CA3AF;
     --text-muted: #64748B;
-    --border: #334155;
-    --border-focus: #3B82F6;
+    --border: #33333F;
+    --border-focus: #3949AB;
     --shadow-color: rgba(0, 0, 0, 0.3);
 
     --chart-1: #3987e5;
@@ -100,7 +96,7 @@
   .card {
     background-color: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 0.75rem;
+    border-radius: var(--radius-xl);
     box-shadow: 0 1px 3px var(--shadow-color);
     transition: all 0.2s ease;
   }
@@ -124,7 +120,7 @@
 
   .input-base:focus {
     border-color: var(--border-focus);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.12);
   }
 
   .btn-primary {
@@ -132,7 +128,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background-color: #2563EB;
+    background-color: var(--color-sigo-primary);
     color: white;
     border-radius: 0.5rem;
     font-size: 0.875rem;
@@ -144,9 +140,9 @@
   }
 
   .btn-primary:hover {
-    background-color: #1D4ED8;
+    background-color: var(--color-sigo-primary-light);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 4px 12px rgba(26, 35, 126, 0.4);
   }
 
   .btn-secondary {
@@ -167,8 +163,8 @@
 
   .btn-secondary:hover {
     background-color: var(--bg);
-    border-color: #2563EB;
-    color: #2563EB;
+    border-color: var(--color-sigo-primary);
+    color: var(--color-sigo-primary);
   }
 
   .btn-danger {
@@ -176,7 +172,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background-color: #EF4444;
+    background-color: var(--color-sigo-error);
     color: white;
     border-radius: 0.5rem;
     font-size: 0.875rem;
@@ -187,7 +183,7 @@
   }
 
   .btn-danger:hover {
-    background-color: #DC2626;
+    background-color: #A82121;
   }
 
   .btn-success {
@@ -195,7 +191,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background-color: #10B981;
+    background-color: var(--color-sigo-success);
     color: white;
     border-radius: 0.5rem;
     font-size: 0.875rem;
@@ -206,7 +202,7 @@
   }
 
   .btn-success:hover {
-    background-color: #059669;
+    background-color: #1B5E20;
   }
 
   .btn-sm {
@@ -232,21 +228,21 @@
 
   .sidebar-item:hover {
     background-color: var(--bg);
-    color: #2563EB;
+    color: var(--color-sigo-primary);
   }
 
   .sidebar-item.active {
-    background-color: #DBEAFE;
-    color: #1D4ED8;
+    background-color: rgba(26, 35, 126, 0.1);
+    color: var(--color-sigo-primary);
   }
 
   .dark .sidebar-item:hover {
-    background-color: rgba(37, 99, 235, 0.1);
+    background-color: rgba(57, 73, 171, 0.15);
   }
 
   .dark .sidebar-item.active {
-    background-color: rgba(37, 99, 235, 0.2);
-    color: #60A5FA;
+    background-color: rgba(57, 73, 171, 0.2);
+    color: var(--color-sigo-primary-light);
   }
 
   .progress-bar {
@@ -259,20 +255,20 @@
   .progress-fill {
     height: 100%;
     border-radius: 9999px;
-    background: linear-gradient(90deg, #2563EB, #0EA5E9);
+    background: linear-gradient(90deg, var(--color-sigo-primary), var(--color-sigo-accent));
     transition: width 0.6s ease;
   }
 
   .gradient-brand {
-    background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 50%, #0EA5E9 100%);
+    background: linear-gradient(135deg, var(--color-sigo-primary) 0%, var(--color-sigo-primary-light) 100%);
   }
 
   .gradient-card {
-    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+    background: linear-gradient(135deg, rgba(26, 35, 126, 0.06) 0%, rgba(26, 35, 126, 0.12) 100%);
   }
 
   .dark .gradient-card {
-    background: linear-gradient(135deg, rgba(30, 58, 138, 0.3) 0%, rgba(37, 99, 235, 0.2) 100%);
+    background: linear-gradient(135deg, rgba(57, 73, 171, 0.15) 0%, rgba(57, 73, 171, 0.28) 100%);
   }
 
   .scrollbar-thin {

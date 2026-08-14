@@ -15,6 +15,7 @@ import {
   Globe,
 } from 'lucide-react';
 import type { AuthRole } from '@/types';
+import { SigoLogoBadge } from '@/components/ui/SigoLogo';
 
 // ─── Tipos de navegación ──────────────────────────────────────────────────────
 interface NavItem {
@@ -268,9 +269,7 @@ export default function Sidebar() {
       >
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 h-16 border-b border-default shrink-0">
-        <div className="w-9 h-9 rounded-xl gradient-brand flex items-center justify-center shrink-0">
-          <Building2 size={20} className="text-white" />
-        </div>
+        <SigoLogoBadge size={36} />
         {!sidebarCollapsed && (
           <div className="overflow-hidden flex-1">
             <p className="text-sm font-bold text-primary leading-none">SIGO</p>
@@ -340,7 +339,7 @@ export default function Sidebar() {
                   {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
                   {/* Badge opcional (ej. conteo de notificaciones) */}
                   {!sidebarCollapsed && item.badge && (
-                    <span className="ml-auto text-xs bg-brand-600 text-white rounded-full px-1.5 py-0.5 leading-none">
+                    <span className="ml-auto text-xs bg-sigo-primary text-white rounded-full px-1.5 py-0.5 leading-none">
                       {item.badge}
                     </span>
                   )}
@@ -356,7 +355,7 @@ export default function Sidebar() {
         <button
           onClick={handleLogout}
           className={cn(
-            'w-full flex items-center gap-2 px-4 py-3 text-xs text-secondary hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors',
+            'w-full flex items-center gap-2 px-4 py-3 text-xs text-secondary hover:text-sigo-error hover:bg-sigo-error/10 dark:hover:bg-sigo-error/15 transition-colors',
             sidebarCollapsed && 'justify-center'
           )}
         >

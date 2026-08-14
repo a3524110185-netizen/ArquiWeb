@@ -201,7 +201,7 @@ export default function IncidenciasPage() {
             onClick={() => { setActiveTab(tab.value); setSearch(''); }}
             className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-colors
               ${activeTab === tab.value
-                ? 'bg-brand-600 text-white shadow-sm'
+                ? 'bg-sigo-primary text-white shadow-sm'
                 : 'text-secondary hover:text-primary'}`}>
             {tab.label}
           </button>

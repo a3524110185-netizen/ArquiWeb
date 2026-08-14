@@ -88,7 +88,7 @@ export default function SuperadminEmpresaDetallePage() {
   if (loading) {
     return (
       <div className="p-16 text-center flex flex-col items-center justify-center gap-3">
-        <Loader2 size={36} className="animate-spin text-brand-600" />
+        <Loader2 size={36} className="animate-spin text-sigo-primary" />
         <p className="text-sm font-medium text-secondary">Cargando empresa...</p>
       </div>
     );
@@ -142,16 +142,16 @@ export default function SuperadminEmpresaDetallePage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 pt-6 border-t border-default">
           <div className="flex items-center gap-2 text-sm text-secondary">
-            <FileText size={16} className="text-brand-500 shrink-0" /> RFC: {empresa.rfc || '—'}
+            <FileText size={16} className="text-sigo-primary shrink-0" /> RFC: {empresa.rfc || '—'}
           </div>
           <div className="flex items-center gap-2 text-sm text-secondary">
-            <Mail size={16} className="text-brand-500 shrink-0" /> {empresa.email || '—'}
+            <Mail size={16} className="text-sigo-primary shrink-0" /> {empresa.email || '—'}
           </div>
           <div className="flex items-center gap-2 text-sm text-secondary">
-            <Phone size={16} className="text-brand-500 shrink-0" /> {empresa.telefono || '—'}
+            <Phone size={16} className="text-sigo-primary shrink-0" /> {empresa.telefono || '—'}
           </div>
           <div className="flex items-center gap-2 text-sm text-secondary">
-            <MapPin size={16} className="text-brand-500 shrink-0" /> {empresa.direccion || '—'}
+            <MapPin size={16} className="text-sigo-primary shrink-0" /> {empresa.direccion || '—'}
           </div>
         </div>
       </Card>
@@ -160,7 +160,7 @@ export default function SuperadminEmpresaDetallePage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Users size={18} className="text-brand-600" /> Usuarios de la Empresa
+            <Users size={18} className="text-sigo-primary" /> Usuarios de la Empresa
           </CardTitle>
           <Button size="sm" onClick={openAdminModal}>
             <ShieldCheck size={14} /> Asignar Administrador
@@ -212,7 +212,7 @@ export default function SuperadminEmpresaDetallePage() {
       >
         <div className="space-y-4">
           <p className="text-sm text-secondary flex items-start gap-2">
-            <UserCog size={16} className="text-brand-500 shrink-0 mt-0.5" />
+            <UserCog size={16} className="text-sigo-primary shrink-0 mt-0.5" />
             Selecciona un usuario de esta empresa para asignarlo como administrador.
           </p>
           <Select

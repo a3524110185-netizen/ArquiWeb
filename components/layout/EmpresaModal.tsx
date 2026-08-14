@@ -59,17 +59,17 @@ export default function EmpresaModal() {
                 onClick={() => setSelectedId(e.id)}
                 className={cn(
                   'relative flex flex-col items-center gap-3 p-6 rounded-2xl border-2 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg',
-                  isSelected ? 'border-brand-600 bg-brand-50 dark:bg-brand-900/20' : 'border-default bg-app'
+                  isSelected ? 'border-sigo-primary bg-sigo-primary/10 dark:bg-sigo-primary/20' : 'border-default bg-app'
                 )}
               >
                 {isSelected && (
-                  <span className="absolute top-3 right-3 w-5 h-5 rounded-full bg-brand-600 text-white flex items-center justify-center">
+                  <span className="absolute top-3 right-3 w-5 h-5 rounded-full bg-sigo-primary text-white flex items-center justify-center">
                     <Check size={12} />
                   </span>
                 )}
                 <div className={cn(
                   'w-14 h-14 rounded-2xl flex items-center justify-center',
-                  isSelected ? 'bg-brand-600 text-white' : 'bg-card text-brand-600 border border-default'
+                  isSelected ? 'bg-sigo-primary text-white' : 'bg-card text-sigo-primary border border-default'
                 )}>
                   <Building2 size={28} />
                 </div>
@@ -79,9 +79,9 @@ export default function EmpresaModal() {
           })}
           <button
             onClick={() => setShowCrearModal(true)}
-            className="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 border-dashed border-default text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-600 hover:shadow-lg"
+            className="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 border-dashed border-default text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-sigo-primary hover:shadow-lg"
           >
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-card text-brand-600 border border-default">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-card text-sigo-primary border border-default">
               <Plus size={28} />
             </div>
             <p className="text-sm font-semibold text-primary">Crear Empresa</p>

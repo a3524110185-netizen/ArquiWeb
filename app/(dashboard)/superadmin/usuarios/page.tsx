@@ -111,14 +111,14 @@ export default function SuperadminUsuariosPage() {
 
         {loading ? (
           <div className="py-16 flex flex-col items-center justify-center gap-3">
-            <Loader2 size={28} className="animate-spin text-brand-600" />
+            <Loader2 size={28} className="animate-spin text-sigo-primary" />
             <p className="text-sm text-muted">Cargando usuarios...</p>
           </div>
         ) : error ? (
           <div className="py-12 text-center space-y-3">
             <AlertCircle className="text-red-500 mx-auto" size={36} />
             <p className="text-sm font-medium text-red-500">{error}</p>
-            <button onClick={cargarUsuarios} className="text-sm text-brand-600 hover:underline font-medium">Reintentar</button>
+            <button onClick={cargarUsuarios} className="text-sm text-sigo-primary hover:underline font-medium">Reintentar</button>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -144,7 +144,7 @@ export default function SuperadminUsuariosPage() {
                       <div className="flex gap-1">
                         <button onClick={() => openRolModal(u)}
                           title="Cambiar rol"
-                          className="p-1.5 rounded-lg text-secondary hover:text-brand-600 hover:bg-brand-50 transition-colors">
+                          className="p-1.5 rounded-lg text-secondary hover:text-sigo-primary hover:bg-sigo-primary/10 transition-colors">
                           <UserCog size={14} />
                         </button>
                         <button onClick={() => handleToggleEstado(u)} disabled={processingId === u.id}

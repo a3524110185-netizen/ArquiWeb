@@ -72,7 +72,7 @@ export default function NuevaEmpresaPage() {
         <Card className="p-6 space-y-4">
           <CardHeader className="p-0 pb-4 border-b border-default">
             <CardTitle className="text-base flex items-center gap-2">
-              <Building2 size={18} className="text-brand-600" />
+              <Building2 size={18} className="text-sigo-primary" />
               <span>Datos de la Empresa</span>
             </CardTitle>
           </CardHeader>

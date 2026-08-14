@@ -115,7 +115,7 @@ export default function NuevoProyectoPage() {
         <Card className="p-6 space-y-6">
           <CardHeader className="p-0 pb-4 border-b border-default">
             <CardTitle className="text-base flex items-center gap-2">
-              <Building2 size={18} className="text-brand-600" />
+              <Building2 size={18} className="text-sigo-primary" />
               <span>Datos Generales</span>
             </CardTitle>
           </CardHeader>
@@ -251,7 +251,7 @@ export default function NuevoProyectoPage() {
                   className="w-20 h-20 rounded-xl object-cover border border-default shrink-0"
                 />
               )}
-              <label className="w-full sm:flex-1 border-2 border-dashed border-default hover:border-brand-500 rounded-xl p-4 text-center cursor-pointer transition-colors bg-app">
+              <label className="w-full sm:flex-1 border-2 border-dashed border-default hover:border-sigo-primary rounded-xl p-4 text-center cursor-pointer transition-colors bg-app">
                 <Upload size={20} className="mx-auto text-muted mb-1" />
                 <span className="text-xs font-medium text-secondary block">
                   {imagenPortada ? imagenPortada.name : 'Haz clic para seleccionar o arrastra una imagen'}

@@ -55,7 +55,7 @@ export default function ReporteDetallePage() {
   if (loading) {
     return (
       <div className="py-16 flex flex-col items-center justify-center gap-3">
-        <Loader2 size={28} className="animate-spin text-brand-600" />
+        <Loader2 size={28} className="animate-spin text-sigo-primary" />
         <p className="text-sm text-muted">Cargando reporte...</p>
       </div>
     );
@@ -67,7 +67,7 @@ export default function ReporteDetallePage() {
         <AlertCircle className="text-red-500 mx-auto" size={36} />
         <p className="text-sm font-medium text-red-500">{error || 'Reporte no encontrado'}</p>
         <div className="flex items-center justify-center gap-4">
-          <button onClick={cargar} className="text-sm text-brand-600 hover:underline font-medium">Reintentar</button>
+          <button onClick={cargar} className="text-sm text-sigo-primary hover:underline font-medium">Reintentar</button>
           <button onClick={() => router.push('/reportes-diarios')} className="text-sm text-secondary hover:underline font-medium">Volver al listado</button>
         </div>
       </div>
@@ -85,7 +85,7 @@ export default function ReporteDetallePage() {
       <div className="flex items-start justify-between flex-wrap gap-4 bg-card p-6 rounded-2xl border border-default shadow-sm">
         <div>
           <h1 className="text-xl font-bold text-primary mb-2">Reporte de Avance</h1>
-          <p className="text-sm font-medium text-brand-600 mb-4">{proyecto?.nombre || `Proyecto #${reporte.proyecto_id}`}</p>
+          <p className="text-sm font-medium text-sigo-primary mb-4">{proyecto?.nombre || `Proyecto #${reporte.proyecto_id}`}</p>
           <div className="flex flex-wrap items-center gap-4 text-xs text-secondary">
             <span className="flex items-center gap-1"><Calendar size={14} /> {formatDate(reporte.fecha_reporte)} · {reporte.turno}</span>
             <span className="flex items-center gap-1"><User size={14} /> {reporte.usuario.nombre}</span>
@@ -96,7 +96,7 @@ export default function ReporteDetallePage() {
           <Badge variant={reporteEstadoVariant(estado)} className="mb-3">{estado}</Badge>
           <div className="text-center">
             <p className="text-[10px] text-muted mb-1 uppercase tracking-wider font-semibold">Avance Reportado</p>
-            <div className="text-2xl font-bold text-brand-600">{reporte.avance}%</div>
+            <div className="text-2xl font-bold text-sigo-primary">{reporte.avance}%</div>
           </div>
         </div>
       </div>
@@ -137,7 +137,7 @@ export default function ReporteDetallePage() {
                 <div key={f.id} className="relative aspect-video rounded-xl overflow-hidden cursor-pointer group" onClick={() => setFotoModal(url)}>
                   <img src={url} alt={f.descripcion || 'Evidencia'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                   {f.es_principal && (
-                    <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-brand-600 text-white text-[10px] font-semibold">Principal</span>
+                    <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-sigo-primary text-white text-[10px] font-semibold">Principal</span>
                   )}
                   {f.descripcion && (
                     <span className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[10px] px-2 py-1 truncate">{f.descripcion}</span>

@@ -217,7 +217,7 @@ export default function AsistenciaPage() {
       {/* Encabezado */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
-          <Timer size={28} className="text-brand-500" />
+          <Timer size={28} className="text-sigo-primary" />
           Registro de Asistencia
         </h1>
         <p className="text-secondary mt-1">Reloj checador — registra tu jornada laboral</p>
@@ -259,7 +259,7 @@ export default function AsistenciaPage() {
         {estado !== 'finalizada' ? (
           loading ? (
             <div className="flex justify-center py-6">
-              <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-sigo-primary border-t-transparent rounded-full animate-spin" />
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3">

@@ -159,7 +159,7 @@ export default function GastosObraPage() {
             <div>
               <CardTitle>Registro de Gastos</CardTitle>
               <p className="text-xs text-muted mt-0.5">
-                Total: <span className="font-semibold text-brand-600">{formatCurrency(resumen?.total_general ?? gastos.reduce((a, g) => a + g.monto, 0))}</span>
+                Total: <span className="font-semibold text-sigo-primary">{formatCurrency(resumen?.total_general ?? gastos.reduce((a, g) => a + g.monto, 0))}</span>
               </p>
             </div>
             {canManage && (
@@ -188,14 +188,14 @@ export default function GastosObraPage() {
 
           {loading ? (
             <div className="py-16 flex flex-col items-center justify-center gap-3">
-              <Loader2 size={28} className="animate-spin text-brand-600" />
+              <Loader2 size={28} className="animate-spin text-sigo-primary" />
               <p className="text-sm text-muted">Cargando gastos...</p>
             </div>
           ) : error ? (
             <div className="py-12 text-center space-y-3">
               <AlertCircle className="text-red-500 mx-auto" size={36} />
               <p className="text-sm font-medium text-red-500">{error}</p>
-              <button onClick={cargarGastos} className="text-sm text-brand-600 hover:underline font-medium">Reintentar</button>
+              <button onClick={cargarGastos} className="text-sm text-sigo-primary hover:underline font-medium">Reintentar</button>
             </div>
           ) : (
             <>
@@ -218,7 +218,7 @@ export default function GastosObraPage() {
                         <td className="py-3 px-3 text-xs text-secondary">{formatDate(g.fecha)}</td>
                         <td className="py-3 px-3 text-xs text-secondary max-w-[200px] truncate">{g.descripcion || '—'}</td>
                         <td className="py-3 px-3">
-                          {g.comprobante_url ? <Paperclip size={14} className="text-brand-600" /> : <span className="text-muted">—</span>}
+                          {g.comprobante_url ? <Paperclip size={14} className="text-sigo-primary" /> : <span className="text-muted">—</span>}
                         </td>
                         <td className="py-3 px-3 text-xs text-secondary">{g.usuario?.nombre || '—'}</td>
                         <td className="py-3 px-3">

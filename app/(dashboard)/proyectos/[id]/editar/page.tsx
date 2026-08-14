@@ -224,7 +224,7 @@ export default function EditarProyectoPage() {
   if (loadingProyecto) {
     return (
       <div className="p-12 text-center flex flex-col items-center justify-center gap-3">
-        <Loader2 size={36} className="animate-spin text-brand-600" />
+        <Loader2 size={36} className="animate-spin text-sigo-primary" />
         <p className="text-sm font-medium text-secondary">Cargando proyecto...</p>
       </div>
     );
@@ -253,7 +253,7 @@ export default function EditarProyectoPage() {
         <Card className="p-6 space-y-6">
           <CardHeader className="p-0 pb-4 border-b border-default">
             <CardTitle className="text-base flex items-center gap-2">
-              <Building2 size={18} className="text-brand-600" />
+              <Building2 size={18} className="text-sigo-primary" />
               <span>Datos Generales del Proyecto</span>
             </CardTitle>
           </CardHeader>
@@ -394,7 +394,7 @@ export default function EditarProyectoPage() {
                   className="w-20 h-20 rounded-xl object-cover border border-default shrink-0"
                 />
               )}
-              <label className="w-full sm:flex-1 border-2 border-dashed border-default hover:border-brand-500 rounded-xl p-4 text-center cursor-pointer transition-colors bg-app">
+              <label className="w-full sm:flex-1 border-2 border-dashed border-default hover:border-sigo-primary rounded-xl p-4 text-center cursor-pointer transition-colors bg-app">
                 <Upload size={20} className="mx-auto text-muted mb-1" />
                 <span className="text-xs font-medium text-secondary block">
                   {imagenPortada ? imagenPortada.name : 'Cambiar imagen de portada'}
@@ -414,7 +414,7 @@ export default function EditarProyectoPage() {
         <Card className="p-6 space-y-6">
           <CardHeader className="p-0 pb-4 border-b border-default flex items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
-              <Users size={18} className="text-brand-600" />
+              <Users size={18} className="text-sigo-primary" />
               <span>Asignar Personal al Proyecto</span>
             </CardTitle>
           </CardHeader>
@@ -456,7 +456,7 @@ export default function EditarProyectoPage() {
                   type="button"
                   onClick={() => handleAsignarTodos('supervisor')}
                   disabled={assigning || assigningMasivo !== null}
-                  className="mt-2 text-xs text-brand-600 hover:underline font-medium inline-flex items-center gap-1 disabled:opacity-50 disabled:no-underline"
+                  className="mt-2 text-xs text-sigo-primary hover:underline font-medium inline-flex items-center gap-1 disabled:opacity-50 disabled:no-underline"
                 >
                   {assigningMasivo === 'supervisor' ? (
                     <Loader2 size={12} className="animate-spin" />
@@ -503,7 +503,7 @@ export default function EditarProyectoPage() {
                   type="button"
                   onClick={() => handleAsignarTodos('ingeniero')}
                   disabled={assigning || assigningMasivo !== null}
-                  className="mt-2 text-xs text-brand-600 hover:underline font-medium inline-flex items-center gap-1 disabled:opacity-50 disabled:no-underline"
+                  className="mt-2 text-xs text-sigo-primary hover:underline font-medium inline-flex items-center gap-1 disabled:opacity-50 disabled:no-underline"
                 >
                   {assigningMasivo === 'ingeniero' ? (
                     <Loader2 size={12} className="animate-spin" />

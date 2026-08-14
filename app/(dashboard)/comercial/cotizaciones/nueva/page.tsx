@@ -114,7 +114,7 @@ export default function NuevaCotizacionPage() {
   if (loadingBase) {
     return (
       <div className="py-16 flex flex-col items-center justify-center gap-3">
-        <Loader2 size={28} className="animate-spin text-brand-600" />
+        <Loader2 size={28} className="animate-spin text-sigo-primary" />
         <p className="text-sm text-muted">Cargando datos...</p>
       </div>
     );
@@ -128,7 +128,7 @@ export default function NuevaCotizacionPage() {
         </button>
         <div>
           <h1 className="text-xl font-bold text-primary flex items-center gap-2">
-            <FileText className="text-brand-600" size={22} /> Nueva Cotización
+            <FileText className="text-sigo-primary" size={22} /> Nueva Cotización
           </h1>
           {folioRef && <p className="text-xs text-muted font-mono">Folio de referencia: {folioRef}</p>}
         </div>

@@ -12,21 +12,21 @@ interface BadgeProps {
 }
 
 const variantStyles: Record<BadgeVariant, string> = {
-  default: 'bg-brand-100 text-brand-900 dark:bg-brand-900/30 dark:text-brand-300',
-  success: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-  warning: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-  danger: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-  info: 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400',
+  default: 'bg-sigo-primary/10 text-sigo-primary dark:bg-sigo-primary/20 dark:text-sigo-primary-light',
+  success: 'bg-sigo-success/10 text-sigo-success dark:bg-sigo-success/20 dark:text-sigo-success',
+  warning: 'bg-sigo-warning/10 text-sigo-warning dark:bg-sigo-warning/20 dark:text-sigo-warning',
+  danger: 'bg-sigo-error/10 text-sigo-error dark:bg-sigo-error/20 dark:text-sigo-error',
+  info: 'bg-sigo-info/10 text-sigo-info dark:bg-sigo-info/20 dark:text-sigo-info',
   purple: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
   gray: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
 };
 
 const dotColors: Record<BadgeVariant, string> = {
-  default: 'bg-brand-600',
-  success: 'bg-emerald-500',
-  warning: 'bg-amber-500',
-  danger: 'bg-red-500',
-  info: 'bg-sky-500',
+  default: 'bg-sigo-primary',
+  success: 'bg-sigo-success',
+  warning: 'bg-sigo-warning',
+  danger: 'bg-sigo-error',
+  info: 'bg-sigo-info',
   purple: 'bg-purple-500',
   gray: 'bg-slate-400',
 };

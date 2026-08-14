@@ -81,7 +81,7 @@ export default function SuperAdminDashboard() {
                   <span className="text-xs text-muted">{new Date(audit.fecha).toLocaleString()}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300">
+                  <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-sigo-primary/10 text-sigo-primary dark:bg-sigo-primary/30 dark:text-sigo-primary-light">
                     {audit.accion.toUpperCase()}
                   </span>
                   <span className="text-xs text-secondary">{audit.recurso}</span>

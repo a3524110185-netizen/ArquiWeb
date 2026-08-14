@@ -139,7 +139,7 @@ export default function DiasNoLaboralesPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <CalendarIcon size={20} className="text-brand-600" />
+            <CalendarIcon size={20} className="text-sigo-primary" />
             <CardTitle>Días Oficiales No Laborales</CardTitle>
           </div>
           {canEdit ? (
@@ -166,14 +166,14 @@ export default function DiasNoLaboralesPage() {
 
         {loading ? (
           <div className="py-16 flex flex-col items-center justify-center gap-3">
-            <Loader2 size={28} className="animate-spin text-brand-600" />
+            <Loader2 size={28} className="animate-spin text-sigo-primary" />
             <p className="text-sm text-muted">Cargando calendario...</p>
           </div>
         ) : error ? (
           <div className="py-12 text-center space-y-3">
             <AlertCircle className="text-red-500 mx-auto" size={36} />
             <p className="text-sm font-medium text-red-500">{error}</p>
-            <button onClick={cargarDias} className="text-sm text-brand-600 hover:underline font-medium">Reintentar</button>
+            <button onClick={cargarDias} className="text-sm text-sigo-primary hover:underline font-medium">Reintentar</button>
           </div>
         ) : (
           <>
@@ -227,7 +227,7 @@ export default function DiasNoLaboralesPage() {
                     <tr key={d.id} className="border-b border-default last:border-0 hover:bg-app transition-colors">
                       <td className="py-3 px-3 pl-0">
                         <div className="flex items-center gap-2">
-                          <CalendarIcon size={14} className="text-brand-500" />
+                          <CalendarIcon size={14} className="text-sigo-primary" />
                           <span className="font-medium text-primary">{formatDate(d.fecha)}</span>
                         </div>
                       </td>

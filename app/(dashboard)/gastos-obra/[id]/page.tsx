@@ -59,7 +59,7 @@ export default function DetalleGastoPage() {
   if (loading) {
     return (
       <div className="py-16 flex flex-col items-center justify-center gap-3">
-        <Loader2 size={28} className="animate-spin text-brand-600" />
+        <Loader2 size={28} className="animate-spin text-sigo-primary" />
         <p className="text-sm text-muted">Cargando gasto...</p>
       </div>
     );
@@ -71,7 +71,7 @@ export default function DetalleGastoPage() {
         <AlertCircle className="text-red-500 mx-auto" size={36} />
         <p className="text-sm font-medium text-red-500">{error || 'Gasto no encontrado'}</p>
         <div className="flex items-center justify-center gap-4">
-          <button onClick={cargar} className="text-sm text-brand-600 hover:underline font-medium">Reintentar</button>
+          <button onClick={cargar} className="text-sm text-sigo-primary hover:underline font-medium">Reintentar</button>
           <button onClick={() => router.push('/gastos-obra')} className="text-sm text-secondary hover:underline font-medium">Volver al listado</button>
         </div>
       </div>
@@ -89,7 +89,7 @@ export default function DetalleGastoPage() {
           </button>
           <div>
             <h1 className="text-xl font-bold text-primary flex items-center gap-2">
-              <DollarSign className="text-brand-600" size={22} /> {formatCurrency(gasto.monto)}
+              <DollarSign className="text-sigo-primary" size={22} /> {formatCurrency(gasto.monto)}
             </h1>
             <p className="text-xs text-muted">{formatDate(gasto.fecha)}</p>
           </div>
@@ -153,7 +153,7 @@ export default function DetalleGastoPage() {
             </a>
           ) : (
             <a href={gasto.comprobante_url} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-brand-600 hover:underline font-medium">
+              className="inline-flex items-center gap-2 text-sm text-sigo-primary hover:underline font-medium">
               <FileText size={16} /> Ver comprobante
             </a>
           )

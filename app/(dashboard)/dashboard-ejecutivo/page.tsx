@@ -74,7 +74,7 @@ export default function DashboardEjecutivoPage() {
   if (loading) {
     return (
       <div className="py-16 flex flex-col items-center justify-center gap-3">
-        <Loader2 size={28} className="animate-spin text-brand-600" />
+        <Loader2 size={28} className="animate-spin text-sigo-primary" />
         <p className="text-sm text-muted">Cargando dashboard ejecutivo...</p>
       </div>
     );
@@ -85,7 +85,7 @@ export default function DashboardEjecutivoPage() {
       <div className="py-16 text-center space-y-3">
         <AlertCircle className="text-red-500 mx-auto" size={36} />
         <p className="text-sm font-medium text-red-500">{error || 'No se pudo cargar el dashboard.'}</p>
-        <button onClick={cargar} className="text-sm text-brand-600 hover:underline font-medium">Reintentar</button>
+        <button onClick={cargar} className="text-sm text-sigo-primary hover:underline font-medium">Reintentar</button>
       </div>
     );
   }
@@ -130,7 +130,7 @@ export default function DashboardEjecutivoPage() {
     {
       key: 'proyectos_activos', label: 'Proyectos Activos', icon: FolderOpen,
       value: `${kpis.proyectos_activos ?? 0} / ${kpis.total_proyectos ?? 0}`,
-      sub: 'En ejecución / total', color: 'text-brand-600', bg: 'bg-brand-50 dark:bg-brand-900/20', href: '/proyectos',
+      sub: 'En ejecución / total', color: 'text-sigo-primary', bg: 'bg-sigo-primary/10 dark:bg-sigo-primary/20', href: '/proyectos',
     },
     {
       key: 'avance_promedio', label: 'Avance Promedio', icon: TrendingUp,
@@ -144,11 +144,11 @@ export default function DashboardEjecutivoPage() {
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
-            <LayoutDashboard className="text-brand-600" size={26} /> Dashboard Ejecutivo
+            <LayoutDashboard className="text-sigo-primary" size={26} /> Dashboard Ejecutivo
           </h1>
           <p className="text-sm text-muted">Indicadores generales del negocio</p>
         </div>
-        <button onClick={cargar} className="inline-flex items-center gap-1.5 text-xs text-brand-600 hover:text-brand-800 font-medium transition-colors">
+        <button onClick={cargar} className="inline-flex items-center gap-1.5 text-xs text-sigo-primary hover:text-sigo-primary font-medium transition-colors">
           <RefreshCw size={13} /> Actualizar
         </button>
       </div>
@@ -224,7 +224,7 @@ export default function DashboardEjecutivoPage() {
         <Card>
           <CardHeader>
             <CardTitle>Últimas Ventas</CardTitle>
-            <Link href="/comercial/ventas" className="text-xs text-brand-600 hover:underline flex items-center gap-1">
+            <Link href="/comercial/ventas" className="text-xs text-sigo-primary hover:underline flex items-center gap-1">
               Ver todas <ArrowRight size={12} />
             </Link>
           </CardHeader>
@@ -233,7 +233,7 @@ export default function DashboardEjecutivoPage() {
               const contenido = (
                 <>
                   <div className="min-w-0">
-                    <p className="text-xs font-mono font-medium text-primary group-hover:text-brand-600">{v.folio}</p>
+                    <p className="text-xs font-mono font-medium text-primary group-hover:text-sigo-primary">{v.folio}</p>
                     <p className="text-[10px] text-muted truncate">{v.cliente || '—'} · {formatDate(v.fecha)}</p>
                   </div>
                   <span className="text-xs font-semibold text-primary shrink-0">{formatCurrency(v.total)}</span>
@@ -258,7 +258,7 @@ export default function DashboardEjecutivoPage() {
         <Card>
           <CardHeader>
             <CardTitle>Últimas Incidencias</CardTitle>
-            <Link href="/incidencias" className="text-xs text-brand-600 hover:underline flex items-center gap-1">
+            <Link href="/incidencias" className="text-xs text-sigo-primary hover:underline flex items-center gap-1">
               Ver todas <ArrowRight size={12} />
             </Link>
           </CardHeader>
@@ -268,7 +268,7 @@ export default function DashboardEjecutivoPage() {
                 <>
                   <Badge variant={estadoIncidenciaVariant[inc.estado] || 'gray'} size="sm">{estadoIncidenciaLabel(inc.estado)}</Badge>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-primary truncate group-hover:text-brand-600">{inc.titulo}</p>
+                    <p className="text-xs font-medium text-primary truncate group-hover:text-sigo-primary">{inc.titulo}</p>
                     <p className="text-[10px] text-muted truncate">{formatDate(inc.fecha)}</p>
                   </div>
                 </>

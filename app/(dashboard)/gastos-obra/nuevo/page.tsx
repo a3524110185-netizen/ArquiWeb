@@ -105,7 +105,7 @@ export default function NuevoGastoPage() {
   if (loadingBase) {
     return (
       <div className="py-16 flex flex-col items-center justify-center gap-3">
-        <Loader2 size={28} className="animate-spin text-brand-600" />
+        <Loader2 size={28} className="animate-spin text-sigo-primary" />
         <p className="text-sm text-muted">Cargando datos...</p>
       </div>
     );
@@ -118,7 +118,7 @@ export default function NuevoGastoPage() {
           <ArrowLeft size={18} />
         </button>
         <h1 className="text-xl font-bold text-primary flex items-center gap-2">
-          <DollarSign className="text-brand-600" size={22} /> Nuevo Gasto de Obra
+          <DollarSign className="text-sigo-primary" size={22} /> Nuevo Gasto de Obra
         </h1>
       </div>
 
@@ -159,7 +159,7 @@ export default function NuevoGastoPage() {
               </div>
             ) : (
               <label className="border-2 border-dashed border-default rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-app transition-colors cursor-pointer">
-                <UploadCloud size={28} className="text-brand-500 mb-2" />
+                <UploadCloud size={28} className="text-sigo-primary mb-2" />
                 <p className="text-sm font-medium text-primary">Haz clic para subir un archivo</p>
                 <p className="text-xs text-muted mt-1">PDF, JPG o PNG (máx. 5MB)</p>
                 <input type="file" className="hidden" accept=".pdf,image/*" onChange={e => handleFile(e.target.files?.[0] || null)} />

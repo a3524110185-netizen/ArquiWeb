@@ -119,11 +119,11 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Header Bienvenida */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-brand-600 via-brand-700 to-accent text-white shadow-lg">
+      <div className="p-6 rounded-2xl bg-gradient-to-r from-sigo-primary via-sigo-primary to-accent text-white shadow-lg">
         <h1 className="text-2xl sm:text-3xl font-bold">
           ¡Bienvenido, {currentUser?.nombre || 'Usuario'}!
         </h1>
-        <p className="mt-2 text-brand-100 text-sm sm:text-base flex items-center gap-2">
+        <p className="mt-2 text-sigo-primary/10 text-sm sm:text-base flex items-center gap-2">
           <span>Rol actual:</span>
           <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white font-medium text-xs uppercase tracking-wider">
             {roleLabels[roleName] || roleName}
@@ -134,7 +134,7 @@ export default function DashboardPage() {
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-brand-50 dark:bg-brand-900/20 text-brand-600 flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-sigo-primary/10 dark:bg-sigo-primary/20 text-sigo-primary flex items-center justify-center shrink-0">
             <FolderOpen size={24} />
           </div>
           <div>
@@ -202,7 +202,7 @@ export default function DashboardPage() {
       <Card className="p-6">
         <CardHeader className="p-0 pb-4 border-b border-default">
           <CardTitle className="text-base flex items-center gap-2">
-            <Clock size={18} className="text-brand-600" />
+            <Clock size={18} className="text-sigo-primary" />
             <span>Actividad Reciente</span>
             {!loadingReportes && reportesRecientes.length > 0 && (
               <span className="text-xs font-normal text-muted">(últimos {reportesRecientes.length} reportes)</span>
@@ -211,7 +211,7 @@ export default function DashboardPage() {
           <button
             onClick={fetchReportesRecientes}
             disabled={loadingReportes}
-            className="inline-flex items-center gap-1.5 text-xs text-brand-600 hover:text-brand-800 font-medium disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs text-sigo-primary hover:text-sigo-primary font-medium disabled:opacity-50 transition-colors"
           >
             <RefreshCw size={13} className={loadingReportes ? 'animate-spin' : ''} />
             Actualizar

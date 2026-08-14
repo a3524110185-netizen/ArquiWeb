@@ -43,7 +43,7 @@ export default function ProyectosGlobalPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProyectos.map(p => (
-          <Card key={p.id} className="flex flex-col hover:border-brand-500 transition-colors cursor-pointer card-hover">
+          <Card key={p.id} className="flex flex-col hover:border-sigo-primary transition-colors cursor-pointer card-hover">
             <CardHeader className="pb-3 border-b border-default">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center shrink-0">
@@ -68,7 +68,7 @@ export default function ProyectosGlobalPage() {
               <div>
                 <div className="flex justify-between text-xs mb-1">
                   <span className="font-medium text-primary">Avance Físico</span>
-                  <span className="text-brand-600 font-bold">{p.avanceFisico}%</span>
+                  <span className="text-sigo-primary font-bold">{p.avanceFisico}%</span>
                 </div>
                 <div className="progress-bar">
                   <div className="progress-fill" style={{ width: `${p.avanceFisico}%` }} />

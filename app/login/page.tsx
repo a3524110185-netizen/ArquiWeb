@@ -2,8 +2,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore, ROLE_REDIRECTS } from '@/store/useAuthStore';
-import { Building2, Mail, Lock, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
+import { SigoLogoMark } from '@/components/ui/SigoLogo';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -79,8 +80,8 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-md px-4">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-sky-500 shadow-lg shadow-blue-500/30 mb-4">
-            <Building2 size={32} className="text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white shadow-lg shadow-black/30 mb-4">
+            <SigoLogoMark size={40} />
           </div>
           <h1 className="text-3xl font-bold text-white">SIGO</h1>
           <p className="text-blue-300 mt-1 text-sm">Sistema de Gestión de Obra</p>

@@ -36,7 +36,7 @@ export default function AuditoriaPage() {
 
       <Card className="overflow-hidden">
         <div className="p-4 border-b border-default bg-app/50 flex items-center gap-2">
-          <ShieldCheck size={18} className="text-brand-500" />
+          <ShieldCheck size={18} className="text-sigo-primary" />
           <h2 className="font-semibold text-primary text-sm">Registro de Actividad</h2>
         </div>
         <div className="overflow-x-auto">

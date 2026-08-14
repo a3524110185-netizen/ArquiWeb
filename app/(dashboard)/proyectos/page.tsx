@@ -122,8 +122,8 @@ export default function ProyectosPage() {
                 onClick={() => setEstadoFilter(f.id)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                   estadoFilter === f.id
-                    ? 'bg-brand-600 text-white shadow-sm'
-                    : 'bg-app hover:bg-brand-50 dark:hover:bg-brand-900/20 text-secondary'
+                    ? 'bg-sigo-primary text-white shadow-sm'
+                    : 'bg-app hover:bg-sigo-primary/10 dark:hover:bg-sigo-primary/20 text-secondary'
                 }`}
               >
                 {f.label}
@@ -179,7 +179,7 @@ export default function ProyectosPage() {
       {/* Estado: Empty */}
       {!loading && !error && filteredProyectos.length === 0 && (
         <Card className="p-12 text-center space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-900/20 flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-2xl bg-sigo-primary/10 text-sigo-primary dark:bg-sigo-primary/20 flex items-center justify-center mx-auto">
             <FolderOpen size={32} />
           </div>
           <div className="space-y-1">
@@ -226,7 +226,7 @@ export default function ProyectosPage() {
                       className="hover:bg-app transition-colors cursor-pointer group"
                     >
                       {/* Código */}
-                      <td className="py-3.5 px-4 font-mono text-xs text-brand-600 dark:text-brand-400 font-bold whitespace-nowrap">
+                      <td className="py-3.5 px-4 font-mono text-xs text-sigo-primary dark:text-sigo-primary-light font-bold whitespace-nowrap">
                         {proyecto.codigo || `PRJ-${proyecto.id}`}
                       </td>
 
@@ -240,12 +240,12 @@ export default function ProyectosPage() {
                               className="w-9 h-9 rounded-lg object-cover shrink-0 border border-default"
                             />
                           ) : (
-                            <div className="w-9 h-9 rounded-lg bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-300 flex items-center justify-center shrink-0">
+                            <div className="w-9 h-9 rounded-lg bg-sigo-primary/10 dark:bg-sigo-primary/30 text-sigo-primary dark:text-sigo-primary-light flex items-center justify-center shrink-0">
                               <Building2 size={18} />
                             </div>
                           )}
                           <div className="min-w-0">
-                            <p className="font-semibold text-primary truncate group-hover:text-brand-600 transition-colors">
+                            <p className="font-semibold text-primary truncate group-hover:text-sigo-primary transition-colors">
                               {proyecto.nombre}
                             </p>
                             {proyecto.descripcion && (

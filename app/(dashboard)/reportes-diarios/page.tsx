@@ -225,9 +225,9 @@ export default function ReportesDiariosPage() {
         <div>
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
-              <ClipboardList className="text-brand-600" size={28} /> Reportes Diarios
+              <ClipboardList className="text-sigo-primary" size={28} /> Reportes Diarios
             </h1>
-            <span className="bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-400 text-xs font-bold px-2.5 py-1 rounded-full">
+            <span className="bg-sigo-primary/10 dark:bg-sigo-primary/20 text-sigo-primary dark:text-sigo-primary-light text-xs font-bold px-2.5 py-1 rounded-full">
               {reportes.filter(r => getEstadoReporte(r) === 'pendiente').length} Pendientes
             </span>
           </div>
@@ -245,7 +245,7 @@ export default function ReportesDiariosPage() {
                 <FolderOpen size={16} className="text-muted" />
               </div>
               <select
-                className="w-full pl-9 pr-10 py-2.5 bg-card border border-default rounded-xl text-sm text-primary font-medium shadow-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 appearance-none cursor-pointer"
+                className="w-full pl-9 pr-10 py-2.5 bg-card border border-default rounded-xl text-sm text-primary font-medium shadow-sm focus:ring-2 focus:ring-sigo-primary/20 focus:border-sigo-primary appearance-none cursor-pointer"
                 value={selectedProyecto}
                 onChange={(e) => setSelectedProyecto(e.target.value)}
               >
@@ -262,7 +262,7 @@ export default function ReportesDiariosPage() {
           <button
             onClick={fetchReportes}
             disabled={loadingReportes || !selectedProyecto}
-            className="p-2.5 bg-card border border-default rounded-xl shadow-sm text-secondary hover:text-brand-500 hover:border-brand-500 transition-colors disabled:opacity-50"
+            className="p-2.5 bg-card border border-default rounded-xl shadow-sm text-secondary hover:text-sigo-primary hover:border-sigo-primary transition-colors disabled:opacity-50"
             title="Actualizar"
           >
             <RefreshCw size={18} className={loadingReportes ? "animate-spin" : ""} />
@@ -275,8 +275,8 @@ export default function ReportesDiariosPage() {
           {/* KPIs */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="bg-card rounded-2xl p-5 border border-default shadow-sm flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-brand-50 dark:bg-brand-900/20 flex items-center justify-center shrink-0">
-                <FileText size={20} className="text-brand-600 dark:text-brand-400" />
+              <div className="w-12 h-12 rounded-full bg-sigo-primary/10 dark:bg-sigo-primary/20 flex items-center justify-center shrink-0">
+                <FileText size={20} className="text-sigo-primary dark:text-sigo-primary-light" />
               </div>
               <div>
                 <p className="text-xs font-medium text-muted uppercase tracking-wider mb-0.5">Total Filtro</p>
@@ -377,7 +377,7 @@ export default function ReportesDiariosPage() {
           <div className="bg-card border border-default rounded-2xl shadow-sm overflow-hidden">
             {loadingReportes ? (
               <div className="p-16 flex flex-col items-center justify-center gap-4">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-600"></div>
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-sigo-primary"></div>
                 <p className="text-sm font-medium text-muted">Cargando información del proyecto...</p>
               </div>
             ) : errorReportes ? (
@@ -427,7 +427,7 @@ export default function ReportesDiariosPage() {
                             onClick={() => toggleRow(rep.id)}
                             className={cn(
                               "group cursor-pointer transition-colors duration-150",
-                              isExpanded ? "bg-brand-50/50 dark:bg-brand-900/10" : "hover:bg-brand-50/30 dark:hover:bg-brand-900/10",
+                              isExpanded ? "bg-sigo-primary/8 dark:bg-sigo-primary/10" : "hover:bg-sigo-primary/5 dark:hover:bg-sigo-primary/10",
                               "even:bg-app/50"
                             )}
                           >
@@ -460,7 +460,7 @@ export default function ReportesDiariosPage() {
                               <div className="flex items-center gap-3">
                                 <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner w-16">
                                   <div
-                                    className="h-full bg-brand-500 rounded-full"
+                                    className="h-full bg-sigo-primary rounded-full"
                                     style={{ width: `${Math.min(100, Math.max(0, rep.avance || 0))}%` }}
                                   />
                                 </div>
@@ -523,7 +523,7 @@ export default function ReportesDiariosPage() {
                           {/* Expanded Row */}
                           {isExpanded && (
                             <tr>
-                              <td colSpan={isGerente ? 8 : 7} className="p-0 border-b-2 border-brand-100 dark:border-brand-900/40 bg-brand-50/30 dark:bg-brand-900/10 overflow-hidden">
+                              <td colSpan={isGerente ? 8 : 7} className="p-0 border-b-2 border-sigo-primary/10 dark:border-sigo-primary/40 bg-sigo-primary/5 dark:bg-sigo-primary/10 overflow-hidden">
                                 <div className="p-6 md:px-8 grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-top-2 duration-200">
                                   
                                   <div className="md:col-span-1 space-y-4">
@@ -562,7 +562,7 @@ export default function ReportesDiariosPage() {
                                             <div 
                                               key={idx} 
                                               onClick={(e) => { e.stopPropagation(); setFotoAmpliada(url); }}
-                                              className="aspect-square bg-app rounded-xl overflow-hidden border border-default cursor-pointer hover:ring-2 hover:ring-brand-400 hover:ring-offset-1 dark:hover:ring-offset-background transition-all"
+                                              className="aspect-square bg-app rounded-xl overflow-hidden border border-default cursor-pointer hover:ring-2 hover:ring-sigo-primary-light hover:ring-offset-1 dark:hover:ring-offset-background transition-all"
                                             >
                                               <img src={url} alt={`Evidencia ${idx+1}`} className="w-full h-full object-cover" />
                                             </div>
@@ -591,8 +591,8 @@ export default function ReportesDiariosPage() {
       ) : (
         /* Pantalla vacía sin proyecto seleccionado */
         <div className="h-96 flex flex-col items-center justify-center bg-card rounded-2xl border border-default shadow-sm p-6 text-center">
-          <div className="w-20 h-20 rounded-full bg-brand-50 dark:bg-brand-900/20 flex items-center justify-center mb-6">
-            <FolderOpen size={40} className="text-brand-500" />
+          <div className="w-20 h-20 rounded-full bg-sigo-primary/10 dark:bg-sigo-primary/20 flex items-center justify-center mb-6">
+            <FolderOpen size={40} className="text-sigo-primary" />
           </div>
           <h2 className="text-xl font-bold text-primary mb-2">Comienza tu revisión</h2>
           <p className="text-muted max-w-sm mx-auto">Selecciona un proyecto del menú superior para visualizar, filtrar y validar sus reportes diarios.</p>
