@@ -139,6 +139,7 @@ export interface DiaNoLaboralFormInput {
 export interface ReporteHorasParams {
   usuario_id?: number | string;
   proyecto_id?: number | string;
+  departamento_id?: number | string;
   desde?: string;
   hasta?: string;
 }

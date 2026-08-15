@@ -4,6 +4,8 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { rhService, ReporteHorasUsuario, ReporteHorasDia } from '@/lib/services/rh';
 import { usuariosService, UsuarioApi } from '@/lib/services/usuarios';
 import { proyectosService, ProyectoApi } from '@/lib/services/proyectos';
+import { departamentosService, DepartamentoApi } from '@/lib/services/departamentos';
+import { exportToCsv } from '@/lib/services/exportService';
 import { extractErrorMessage, extractFieldErrors } from '@/lib/services/api';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -21,6 +23,7 @@ export default function ReporteHorasPage() {
 
   const [usuarios, setUsuarios] = useState<UsuarioApi[]>([]);
   const [proyectos, setProyectos] = useState<ProyectoApi[]>([]);
+  const [departamentos, setDepartamentos] = useState<DepartamentoApi[]>([]);
   const [resumen, setResumen] = useState<ReporteHorasUsuario[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +31,7 @@ export default function ReporteHorasPage() {
   const defaultRange = useMemo(() => getDefaultDateRange(), []);
   const [filtroUsuario, setFiltroUsuario] = useState('');
   const [filtroProyecto, setFiltroProyecto] = useState('');
+  const [filtroDepartamento, setFiltroDepartamento] = useState('');
   const [desde, setDesde] = useState(defaultRange.desde);
   const [hasta, setHasta] = useState(defaultRange.hasta);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -42,7 +46,10 @@ export default function ReporteHorasPage() {
   }, [canFilterUsuario, currentUser]);
 
   useEffect(() => {
-    if (canFilterUsuario) usuariosService.getUsuarios('1').then(setUsuarios).catch(() => {});
+    if (canFilterUsuario) {
+      usuariosService.getUsuarios('1').then(setUsuarios).catch(() => {});
+      departamentosService.getDepartamentos().then(setDepartamentos).catch(() => {});
+    }
     proyectosService.getProyectos().then(setProyectos).catch(() => {});
   }, [canFilterUsuario]);
 
@@ -54,10 +61,20 @@ export default function ReporteHorasPage() {
       const data = await rhService.getReporteHoras({
         usuario_id: filtroUsuario || undefined,
         proyecto_id: filtroProyecto || undefined,
+        departamento_id: filtroDepartamento || undefined,
         desde: desde || undefined,
         hasta: hasta || undefined,
       });
-      setResumen(data);
+      // El backend puede no soportar departamento_id todavía; se filtra también
+      // en cliente cruzando contra el departamento de cada usuario (ya cargado
+      // para el filtro de Usuario) para garantizar el resultado correcto.
+      const filtrada = filtroDepartamento
+        ? data.filter(row => {
+            const u = usuarios.find(u => u.id === row.usuario.id);
+            return String(u?.departamento_id ?? '') === filtroDepartamento;
+          })
+        : data;
+      setResumen(filtrada);
       setExpandedId(null);
     } catch (err: any) {
       setError(extractErrorMessage(err, 'Error al cargar el reporte de horas.'));
@@ -65,7 +82,7 @@ export default function ReporteHorasPage() {
     } finally {
       setLoading(false);
     }
-  }, [filtroUsuario, filtroProyecto, desde, hasta]);
+  }, [filtroUsuario, filtroProyecto, filtroDepartamento, desde, hasta, usuarios]);
 
   useEffect(() => {
     // Esperar a que se fije el usuario para roles restringidos
@@ -103,7 +120,38 @@ export default function ReporteHorasPage() {
   };
 
   const handleExport = () => {
-    toast.info('En desarrollo', 'La exportación a Excel/PDF estará disponible próximamente.');
+    if (resumen.length === 0) return;
+    try {
+      const headers = ['Usuario', 'Total Horas', 'Horas Extra', 'Faltas', 'Días Trabajados'];
+      const filas: (string | number)[][] = [];
+      resumen.forEach(row => {
+        const nombre = row.usuario?.nombre || usuarios.find(u => u.id === row.usuario.id)?.nombre || `Usuario ${row.usuario.id}`;
+        filas.push([
+          nombre,
+          (row.total_horas || 0).toFixed(2),
+          (row.horas_extra || 0).toFixed(2),
+          row.faltas || 0,
+          row.dias_trabajados || 0,
+        ]);
+        // Desglose diario: se usa lo que ya esté cargado en memoria (cache de la
+        // fila expandible o lo que trajo el propio resumen); no se disparan
+        // fetches nuevos solo para exportar.
+        const dias = detalleCache[row.usuario.id] || row.dias || [];
+        dias.forEach(d => {
+          filas.push([
+            `  └ ${formatDate(d.fecha)}`,
+            (d.horas_trabajadas || 0).toFixed(2),
+            (d.horas_extra || 0).toFixed(2),
+            d.estado?.toLowerCase() === 'falta' ? 1 : 0,
+            d.estado?.toLowerCase() === 'completo' ? 1 : 0,
+          ]);
+        });
+      });
+      exportToCsv(headers, filas, `Reporte_Horas_${desde}_a_${hasta}`);
+      toast.success('Excel exportado', 'El archivo se descargó correctamente.');
+    } catch (err: any) {
+      toast.error('Error al exportar', extractErrorMessage(err, 'No se pudo generar el archivo.'));
+    }
   };
 
   return (
@@ -115,19 +163,24 @@ export default function ReporteHorasPage() {
           </h1>
           <p className="text-sm text-muted">Resumen de horas trabajadas, extras y faltas por trabajador</p>
         </div>
-        <Button onClick={handleExport} variant="secondary">
+        <Button onClick={handleExport} variant="secondary" disabled={resumen.length === 0}>
           <Download size={16} /> Exportar Excel
         </Button>
       </div>
 
       {/* Filtros */}
       <Card>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {canFilterUsuario && (
             <Select label="Usuario" placeholder="Todos los usuarios" value={filtroUsuario}
               onChange={e => setFiltroUsuario(e.target.value)}
               error={fieldErrors.usuario_id}
               options={usuarios.map(u => ({ value: String(u.id), label: u.nombre }))} />
+          )}
+          {canFilterUsuario && (
+            <Select label="Departamento" placeholder="Todos los departamentos" value={filtroDepartamento}
+              onChange={e => setFiltroDepartamento(e.target.value)}
+              options={departamentos.map(d => ({ value: String(d.id), label: d.nombre }))} />
           )}
           <Select label="Proyecto" placeholder="Todos los proyectos" value={filtroProyecto}
             onChange={e => setFiltroProyecto(e.target.value)}
