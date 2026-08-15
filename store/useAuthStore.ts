@@ -37,6 +37,7 @@ interface AuthState {
   logout: () => Promise<void>;
   initAuth: () => Promise<void>;
   cambiarEmpresa: (empresaId: number) => Promise<void>;
+  updateCurrentUser: (partial: Partial<AuthUser>) => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -167,5 +168,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (currentUser) {
       set({ currentUser: { ...currentUser, empresa_actual: response.data.empresa } });
     }
+  },
+
+  updateCurrentUser: (partial) => {
+    const { currentUser } = get();
+    if (currentUser) set({ currentUser: { ...currentUser, ...partial } });
   },
 }));

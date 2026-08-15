@@ -12,7 +12,7 @@ import {
   Building2, ClipboardList, ShieldAlert, FileCheck,
   ShoppingCart, BarChart3, Boxes, LogOut, ShieldCheck,
   UserCircle, Timer, Briefcase, CalendarCheck, Hammer, X,
-  Globe,
+  Globe, Bell,
 } from 'lucide-react';
 import type { AuthRole } from '@/types';
 import { SigoLogoBadge } from '@/components/ui/SigoLogo';
@@ -80,12 +80,15 @@ const administradorNav: NavGroup[] = [
     title: 'Configuración',
     items: [
       { label: 'Categorías', href: '/configuracion/categorias', icon: Settings },
+      { label: 'Empresa', href: '/configuracion/empresa', icon: Building2 },
     ],
   },
   {
     title: 'Universal',
     items: [
       { label: 'Asistencia (Checador)', href: '/asistencia', icon: CalendarCheck },
+      { label: 'Perfil', href: '/perfil', icon: UserCircle },
+      { label: 'Notificaciones', href: '/notificaciones', icon: Bell },
     ],
   },
 ];
@@ -134,6 +137,8 @@ const gerenteNav: NavGroup[] = [
     title: 'Universal',
     items: [
       { label: 'Asistencia (Checador)', href: '/asistencia', icon: CalendarCheck },
+      { label: 'Perfil', href: '/perfil', icon: UserCircle },
+      { label: 'Notificaciones', href: '/notificaciones', icon: Bell },
     ],
   },
 ];
@@ -152,6 +157,8 @@ const ingenieroNav: NavGroup[] = [
     title: 'Universal',
     items: [
       { label: 'Asistencia (Checador)', href: '/asistencia', icon: CalendarCheck },
+      { label: 'Perfil', href: '/perfil', icon: UserCircle },
+      { label: 'Notificaciones', href: '/notificaciones', icon: Bell },
     ],
   },
 ];
@@ -171,6 +178,8 @@ const supervisorNav: NavGroup[] = [
     title: 'Universal',
     items: [
       { label: 'Asistencia (Checador)', href: '/asistencia', icon: CalendarCheck },
+      { label: 'Perfil', href: '/perfil', icon: UserCircle },
+      { label: 'Notificaciones', href: '/notificaciones', icon: Bell },
     ],
   },
 ];
@@ -183,6 +192,13 @@ const superAdminNav: NavGroup[] = [
       { label: 'Dashboard Superadmin', href: '/dashboard-superadmin', icon: LayoutDashboard },
       { label: 'Empresas', href: '/superadmin/empresas', icon: Building2 },
       { label: 'Usuarios Globales', href: '/superadmin/usuarios', icon: Globe },
+    ],
+  },
+  {
+    title: 'Cuenta',
+    items: [
+      { label: 'Perfil', href: '/perfil', icon: UserCircle },
+      { label: 'Notificaciones', href: '/notificaciones', icon: Bell },
     ],
   },
 ];

@@ -51,6 +51,15 @@ export const api = {
       body: JSON.stringify(data),
     });
   },
+
+  // Subida de archivos (multipart/form-data). Laravel no interpreta bien el
+  // body multipart en peticiones PUT/PATCH nativas, así que para 'PUT' se
+  // envía como POST con el campo _method=PUT (mismo truco ya usado en
+  // gastosObra.ts/proyectos.ts, ahora centralizado aquí).
+  async upload<T>(endpoint: string, formData: FormData, method: 'POST' | 'PUT' = 'POST'): Promise<ApiResponse<T>> {
+    if (method === 'PUT') formData.append('_method', 'PUT');
+    return fetchApi<T>(endpoint, { method: 'POST', body: formData });
+  },
 };
 
 export function extractErrorMessage(err: unknown, fallback = 'Ocurrió un error inesperado'): string {
@@ -80,8 +89,10 @@ export function extractFieldErrors(err: unknown): Record<string, string> {
 async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
   const url = `${API_URL}${endpoint}`;
   const headers = new Headers(options.headers || {});
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
 
-  headers.set('Content-Type', 'application/json');
+  // Con FormData, dejar que el navegador fije el Content-Type (incluye el boundary).
+  if (!isFormData) headers.set('Content-Type', 'application/json');
   headers.set('Accept', 'application/json');
   headers.set('ngrok-skip-browser-warning', 'true');
 

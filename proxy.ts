@@ -31,6 +31,8 @@ const ROLE_ACCESS: Record<string, string[]> = {
     '/configuracion',
     '/dashboard-ejecutivo',
     '/asistencia',         // Universal - todos los roles
+    '/perfil',              // Universal - todos los roles
+    '/notificaciones',      // Universal - todos los roles
   ],
   gerente: [
     '/dashboard',
@@ -47,6 +49,8 @@ const ROLE_ACCESS: Record<string, string[]> = {
     '/comercial',          // cotizaciones, inventario, ventas, pedidos
     '/dashboard-ejecutivo',
     '/asistencia',         // Universal - todos los roles
+    '/perfil',              // Universal - todos los roles
+    '/notificaciones',      // Universal - todos los roles
   ],
   ingeniero: [
     '/proyectos',          // Solo proyectos asignados (filtrado en frontend)
@@ -54,6 +58,8 @@ const ROLE_ACCESS: Record<string, string[]> = {
     '/galeria-evidencias',
     '/reporte-horas',      // Solo sus propias horas (filtrado en frontend)
     '/asistencia',         // Universal - todos los roles
+    '/perfil',              // Universal - todos los roles
+    '/notificaciones',      // Universal - todos los roles
   ],
   supervisor: [
     '/proyectos',          // Solo proyectos asignados (filtrado en frontend)
@@ -62,10 +68,14 @@ const ROLE_ACCESS: Record<string, string[]> = {
     '/galeria-evidencias',
     '/reporte-horas',      // Solo sus propias horas (filtrado en frontend)
     '/asistencia',         // Universal - todos los roles
+    '/perfil',              // Universal - todos los roles
+    '/notificaciones',      // Universal - todos los roles
   ],
   superadmin: [
     '/dashboard-superadmin', // Dashboard con KPIs globales
     '/superadmin',            // Gestión de empresas y usuarios globales
+    '/perfil',                // Universal - todos los roles
+    '/notificaciones',        // Universal - todos los roles
   ],
 };
 

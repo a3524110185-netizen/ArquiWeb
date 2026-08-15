@@ -1,5 +1,15 @@
 import { api } from './api';
 
+function buildFormData(data: Record<string, unknown>): FormData {
+  const formData = new FormData();
+  Object.entries(data).forEach(([key, value]) => {
+    if (value === undefined || value === null) return;
+    if (value instanceof File) formData.append(key, value);
+    else formData.append(key, String(value));
+  });
+  return formData;
+}
+
 export interface RolApi {
   id: number;
   nombre: string;
@@ -33,6 +43,7 @@ export interface UsuarioFormInput {
   rol_id: number | string;
   telefono?: string;
   departamento_id?: number | string | null;
+  foto_perfil?: File | null;
 }
 
 // Fallback usado solo si GET /api/roles no está disponible.
@@ -68,9 +79,14 @@ export const usuariosService = {
     return response.data?.usuario || response.data;
   },
 
-  // PUT /api/usuarios/{id}
+  // PUT /api/usuarios/{id} (multipart si se incluye foto_perfil)
   async updateUsuario(id: number | string, data: Partial<UsuarioFormInput> & { activo?: boolean }): Promise<UsuarioApi> {
-    const response = await api.put<any>(`/usuarios/${id}`, data);
+    if (data.foto_perfil instanceof File) {
+      const response = await api.upload<any>(`/usuarios/${id}`, buildFormData(data), 'PUT');
+      return response.data?.usuario || response.data;
+    }
+    const { foto_perfil: _fotoPerfil, ...rest } = data;
+    const response = await api.put<any>(`/usuarios/${id}`, rest);
     return response.data?.usuario || response.data;
   },
 

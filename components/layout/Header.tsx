@@ -7,6 +7,7 @@ import { Bell, Sun, Moon, LogOut, Menu } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { timeAgo } from '@/lib/utils';
 import { cn } from '@/lib/utils';
+import { severidadDeTipo } from '@/lib/services/notificaciones';
 
 const pageTitles: Record<string, string> = {
   '/dashboard': 'Dashboard',
@@ -40,13 +41,17 @@ const pageTitles: Record<string, string> = {
 };
 
 export default function Header() {
-  const { darkMode, toggleDarkMode, notificaciones, marcarNotificacionLeida, sidebarCollapsed, toggleMobileSidebar } = useStore();
+  const { darkMode, toggleDarkMode, notificaciones, fetchNotificaciones, marcarNotificacionLeida, sidebarCollapsed, toggleMobileSidebar } = useStore();
   const { currentUser, logout } = useAuthStore();
   const pathname = usePathname();
   const router = useRouter();
   const [showNotif, setShowNotif] = useState(false);
 
   const unread = notificaciones.filter(n => !n.leida).length;
+
+  useEffect(() => {
+    fetchNotificaciones();
+  }, [fetchNotificaciones]);
 
   const title = Object.entries(pageTitles).find(([k]) => pathname.startsWith(k))?.[1]
     ?? (pathname.includes('/proyectos/') ? 'Detalle de Proyecto'
@@ -127,9 +132,14 @@ export default function Header() {
             <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-default rounded-xl shadow-xl z-50 fade-in">
               <div className="px-4 py-3 border-b border-default flex items-center justify-between">
                 <p className="text-sm font-semibold text-primary">Notificaciones</p>
-                <span className="text-xs text-sigo-primary font-medium">{unread} sin leer</span>
+                {notificaciones.length > 0 && (
+                  <span className="text-xs text-sigo-primary font-medium">{unread} sin leer</span>
+                )}
               </div>
               <div className="max-h-72 overflow-y-auto scrollbar-thin">
+                {notificaciones.length === 0 && (
+                  <p className="px-4 py-6 text-center text-xs text-muted">Sin notificaciones por ahora</p>
+                )}
                 {notificaciones.map(n => (
                   <div
                     key={n.id}
@@ -141,10 +151,10 @@ export default function Header() {
                   >
                     <div className="flex items-start gap-2">
                       <div className={cn('w-2 h-2 rounded-full mt-1.5 shrink-0', {
-                        'bg-sigo-error': n.tipo === 'error',
-                        'bg-sigo-warning': n.tipo === 'warning',
-                        'bg-sigo-info': n.tipo === 'info',
-                        'bg-sigo-success': n.tipo === 'success',
+                        'bg-sigo-error': severidadDeTipo(n.tipo) === 'error',
+                        'bg-sigo-warning': severidadDeTipo(n.tipo) === 'warning',
+                        'bg-sigo-info': severidadDeTipo(n.tipo) === 'info',
+                        'bg-sigo-success': severidadDeTipo(n.tipo) === 'success',
                       })} />
                       <div>
                         <p className="text-xs font-semibold text-primary">{n.titulo}</p>

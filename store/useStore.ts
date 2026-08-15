@@ -2,9 +2,10 @@ import { create } from 'zustand';
 import type {
   Proyecto, Usuario, Incidencia, ReporteDiario,
   RegistroHorario, DiaNolaboral, Categoria, Material, Proveedor,
-  ActividadReciente, Notificacion, IncidenciaEstado,
+  ActividadReciente, IncidenciaEstado,
   Empresa, Auditoria, Licencia, Cotizacion, CotizacionItem, PedidoVenta, Venta,
 } from '@/types';
+import { notificacionesService, type NotificacionApi } from '@/lib/services/notificaciones';
 
 // ─────────────────────────────────────────────
 // MOCK DATA
@@ -412,13 +413,6 @@ const actividadMock: ActividadReciente[] = [
   { id: 'a15', tipo: 'validacion', descripcion: 'Reporte de Pavimentación aprobado', proyecto: 'Calle 5 de Mayo', usuario: 'Luis Pérez', fecha: '2025-05-28T12:00:00', icono: 'CheckCircle' },
 ];
 
-const notificacionesMock: Notificacion[] = [
-  { id: 'n1', titulo: 'Incidencia Crítica', descripcion: 'Fisura en pilote P-12 requiere atención inmediata', tipo: 'error', leida: false, fecha: '2025-05-31T08:45:00' },
-  { id: 'n2', titulo: 'Stock Bajo', descripcion: 'Varilla corrugada 3/8\" por debajo del mínimo', tipo: 'warning', leida: false, fecha: '2025-05-30T14:00:00' },
-  { id: 'n3', titulo: 'Reporte Pendiente', descripcion: '2 reportes sin validar del día de hoy', tipo: 'info', leida: false, fecha: '2025-05-31T09:00:00' },
-  { id: 'n4', titulo: 'Licencia por Vencer', descripcion: 'Materiales XYZ – licencia vence en 30 días', tipo: 'warning', leida: false, fecha: '2025-05-31T06:00:00' },
-];
-
 const auditoriasMock: Auditoria[] = [
   { id: 'aud1', usuarioId: 'auth_1', usuarioNombre: 'Luis Pérez', usuarioEmail: 'admin@arquitectura.com', accion: 'login', recurso: 'Sistema', detalle: 'Inicio de sesión exitoso como Super Admin', fecha: '2025-05-31T09:00:00', ip: '192.168.1.10' },
   { id: 'aud2', usuarioId: 'auth_2', usuarioNombre: 'Ana García', usuarioEmail: 'gerente@arquitectura.com', empresaId: 'e1', empresaNombre: 'Constructora ABC', accion: 'login', recurso: 'Sistema', detalle: 'Inicio de sesión exitoso como Gerente', fecha: '2025-05-31T08:30:00', ip: '192.168.1.11' },
@@ -545,7 +539,8 @@ interface AppState {
   materiales: Material[];
   proveedores: Proveedor[];
   actividad: ActividadReciente[];
-  notificaciones: Notificacion[];
+  notificaciones: NotificacionApi[];
+  notificacionesLoading: boolean;
   cotizaciones: Cotizacion[];
   pedidos: PedidoVenta[];
   ventas: Venta[];
@@ -622,7 +617,9 @@ interface AppState {
   updateRegistroHorario: (id: string, h: Partial<RegistroHorario>) => void;
 
   // Notificaciones
-  marcarNotificacionLeida: (id: string) => void;
+  fetchNotificaciones: () => Promise<void>;
+  marcarNotificacionLeida: (id: number) => Promise<void>;
+  marcarTodasNotificacionesLeidas: () => Promise<void>;
 
   // Auditoria
   addAuditoria: (a: Omit<Auditoria, 'id'>) => void;
@@ -646,7 +643,8 @@ export const useStore = create<AppState>((set) => ({
   materiales: materialesMock,
   proveedores: proveedoresMock,
   actividad: actividadMock,
-  notificaciones: notificacionesMock,
+  notificaciones: [],
+  notificacionesLoading: false,
   cotizaciones: cotizacionesMock,
   pedidos: pedidosMock,
   ventas: ventasMock,
@@ -754,7 +752,36 @@ export const useStore = create<AppState>((set) => ({
   addRegistroHorario: (h) => set((s) => ({ horarios: [...s.horarios, { ...h, id: uid() }] })),
   updateRegistroHorario: (id, h) => set((s) => ({ horarios: s.horarios.map(x => x.id === id ? { ...x, ...h } : x) })),
 
-  marcarNotificacionLeida: (id) => set((s) => ({ notificaciones: s.notificaciones.map(n => n.id === id ? { ...n, leida: true } : n) })),
+  fetchNotificaciones: async () => {
+    set({ notificacionesLoading: true });
+    try {
+      const data = await notificacionesService.listar();
+      set({ notificaciones: data });
+    } catch {
+      // Silencioso: no bloquear la UI si el endpoint aún no existe o falla.
+    } finally {
+      set({ notificacionesLoading: false });
+    }
+  },
+
+  marcarNotificacionLeida: async (id) => {
+    set((s) => ({ notificaciones: s.notificaciones.map(n => n.id === id ? { ...n, leida: true } : n) }));
+    try {
+      await notificacionesService.marcarLeida(id);
+    } catch {
+      // El estado optimista se queda como leída aunque falle la llamada;
+      // se corregirá en el siguiente fetchNotificaciones().
+    }
+  },
+
+  marcarTodasNotificacionesLeidas: async () => {
+    set((s) => ({ notificaciones: s.notificaciones.map(n => ({ ...n, leida: true })) }));
+    try {
+      await notificacionesService.marcarTodasLeidas();
+    } catch {
+      // Idem: estado optimista, se resincroniza en el próximo fetch.
+    }
+  },
 
   addAuditoria: (a) => set((s) => ({ auditorias: [{ ...a, id: uid() }, ...s.auditorias] })),
 }));

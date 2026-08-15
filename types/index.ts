@@ -19,6 +19,7 @@ export interface AuthUser {
   proyectos?: any[];
   empresa_actual?: EmpresaResumen | null;
   empresas_disponibles?: EmpresaResumen[];
+  departamento?: { id: number; nombre: string } | null;
 }
 
 // ─── Existing Roles ───────────────────────────────────────────────────────────
@@ -335,14 +336,4 @@ export interface ActividadReciente {
   usuario: string;
   fecha: string;
   icono: string;
-}
-
-// ─── Notificación ─────────────────────────────────────────────────────────────
-export interface Notificacion {
-  id: string;
-  titulo: string;
-  descripcion: string;
-  tipo: 'info' | 'warning' | 'error' | 'success';
-  leida: boolean;
-  fecha: string;
 }
