@@ -165,6 +165,7 @@ export interface ReporteHorasUsuario {
 export interface ControlHorarioParams {
   usuario_id?: number | string;
   proyecto_id?: number | string;
+  departamento_id?: number | string;
   desde?: string;
   hasta?: string;
   estado?: string;

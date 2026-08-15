@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { rhService, ControlHorarioRegistro } from '@/lib/services/rh';
 import { usuariosService, UsuarioApi } from '@/lib/services/usuarios';
 import { proyectosService, ProyectoApi } from '@/lib/services/proyectos';
+import { departamentosService, DepartamentoApi } from '@/lib/services/departamentos';
 import { extractErrorMessage, extractFieldErrors } from '@/lib/services/api';
 import Card from '@/components/ui/Card';
 import Badge, { BadgeVariant } from '@/components/ui/Badge';
@@ -35,6 +36,7 @@ export default function ControlHorarioPage() {
 
   const [usuarios, setUsuarios] = useState<UsuarioApi[]>([]);
   const [proyectos, setProyectos] = useState<ProyectoApi[]>([]);
+  const [departamentos, setDepartamentos] = useState<DepartamentoApi[]>([]);
   const [registros, setRegistros] = useState<ControlHorarioRegistro[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +46,7 @@ export default function ControlHorarioPage() {
   const defaultRange = useMemo(() => getDefaultDateRange(), []);
   const [filtroUsuario, setFiltroUsuario] = useState('');
   const [filtroProyecto, setFiltroProyecto] = useState('');
+  const [filtroDepartamento, setFiltroDepartamento] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('todos');
   const [desde, setDesde] = useState(defaultRange.desde);
   const [hasta, setHasta] = useState(defaultRange.hasta);
@@ -54,9 +57,19 @@ export default function ControlHorarioPage() {
   }, [canFilterUsuario, currentUser]);
 
   useEffect(() => {
-    if (canFilterUsuario) usuariosService.getUsuarios('1').then(setUsuarios).catch(() => {});
+    if (canFilterUsuario) {
+      usuariosService.getUsuarios('1').then(setUsuarios).catch(() => {});
+      departamentosService.getDepartamentos(true).then(setDepartamentos).catch(() => {});
+    }
     proyectosService.getProyectos().then(setProyectos).catch(() => {});
   }, [canFilterUsuario]);
+
+  // Mapa usuario → departamento (para filtrar en cliente; ver cargarRegistros).
+  const usuarioDepartamentoMap = useMemo(() => {
+    const map = new Map<number, number | null>();
+    usuarios.forEach(u => map.set(u.id, u.departamento_id ?? null));
+    return map;
+  }, [usuarios]);
 
   const cargarRegistros = useCallback(async () => {
     setLoading(true);
@@ -66,18 +79,25 @@ export default function ControlHorarioPage() {
       const data = await rhService.getControlHorario({
         usuario_id: filtroUsuario || undefined,
         proyecto_id: filtroProyecto || undefined,
+        departamento_id: filtroDepartamento || undefined,
         desde: desde || undefined,
         hasta: hasta || undefined,
         estado: filtroEstado !== 'todos' ? filtroEstado : undefined,
       });
-      setRegistros(data);
+      // El backend puede no soportar departamento_id todavía; se filtra también
+      // en cliente cruzando contra el departamento de cada usuario (ya cargado
+      // para el filtro de Usuario) para garantizar el resultado correcto.
+      const filtrada = filtroDepartamento
+        ? data.filter(r => String(usuarioDepartamentoMap.get(r.usuario_id) ?? '') === filtroDepartamento)
+        : data;
+      setRegistros(filtrada);
     } catch (err: any) {
       setError(extractErrorMessage(err, 'Error al cargar el control horario.'));
       setFieldErrors(extractFieldErrors(err));
     } finally {
       setLoading(false);
     }
-  }, [filtroUsuario, filtroProyecto, filtroEstado, desde, hasta]);
+  }, [filtroUsuario, filtroProyecto, filtroDepartamento, filtroEstado, desde, hasta, usuarioDepartamentoMap]);
 
   useEffect(() => {
     // Esperar a que se fije el usuario para roles restringidos
@@ -199,12 +219,18 @@ export default function ControlHorarioPage() {
 
       {/* Filtros */}
       <Card>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
           {canFilterUsuario && (
             <Select label="Usuario" placeholder="Todos los usuarios" value={filtroUsuario}
               onChange={e => { setFiltroUsuario(e.target.value); setPage(1); }}
               error={fieldErrors.usuario_id}
               options={usuarios.map(u => ({ value: String(u.id), label: u.nombre }))} />
+          )}
+          {canFilterUsuario && (
+            <Select label="Departamento" placeholder="Todos los departamentos" value={filtroDepartamento}
+              onChange={e => { setFiltroDepartamento(e.target.value); setPage(1); }}
+              error={fieldErrors.departamento_id}
+              options={departamentos.map(d => ({ value: String(d.id), label: d.nombre }))} />
           )}
           <Select label="Proyecto" placeholder="Todos los proyectos" value={filtroProyecto}
             onChange={e => { setFiltroProyecto(e.target.value); setPage(1); }}

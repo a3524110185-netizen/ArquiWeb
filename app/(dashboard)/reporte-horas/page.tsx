@@ -48,7 +48,7 @@ export default function ReporteHorasPage() {
   useEffect(() => {
     if (canFilterUsuario) {
       usuariosService.getUsuarios('1').then(setUsuarios).catch(() => {});
-      departamentosService.getDepartamentos().then(setDepartamentos).catch(() => {});
+      departamentosService.getDepartamentos(true).then(setDepartamentos).catch(() => {});
     }
     proyectosService.getProyectos().then(setProyectos).catch(() => {});
   }, [canFilterUsuario]);
