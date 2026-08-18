@@ -47,7 +47,7 @@ export default function RegistroPage() {
       return;
     }
     setLoadingDepartamentos(true);
-    departamentosService.getDepartamentos(true, form.empresa_id)
+    departamentosService.getDepartamentosPublicos(form.empresa_id)
       .then(setDepartamentos)
       .catch(() => toast.error('Error', 'No se pudieron cargar los departamentos'))
       .finally(() => setLoadingDepartamentos(false));

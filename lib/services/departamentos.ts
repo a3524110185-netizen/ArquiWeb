@@ -18,6 +18,14 @@ function extractArray<T>(data: any, keys: string[] = []): T[] {
 }
 
 export const departamentosService = {
+  // ENDPOINT PÚBLICO - Para registro (sin autenticación)
+  // GET /api/departamentos-publicos?empresa_id=
+  async getDepartamentosPublicos(empresaId: number | string): Promise<DepartamentoApi[]> {
+    const response = await api.get<any>(`/departamentos-publicos?empresa_id=${empresaId}`);
+    return extractArray<DepartamentoApi>(response.data, ['departamentos']);
+  },
+
+  // ENDPOINT AUTENTICADO - Para uso interno
   // GET /api/departamentos?activo=&empresa_id=
   async getDepartamentos(activo?: boolean, empresaId?: number | string): Promise<DepartamentoApi[]> {
     const params = new URLSearchParams();
