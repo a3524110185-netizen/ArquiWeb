@@ -18,9 +18,12 @@ function extractArray<T>(data: any, keys: string[] = []): T[] {
 }
 
 export const departamentosService = {
-  // GET /api/departamentos?activo=
-  async getDepartamentos(activo?: boolean): Promise<DepartamentoApi[]> {
-    const query = activo !== undefined ? `?activo=${activo ? 1 : 0}` : '';
+  // GET /api/departamentos?activo=&empresa_id=
+  async getDepartamentos(activo?: boolean, empresaId?: number | string): Promise<DepartamentoApi[]> {
+    const params = new URLSearchParams();
+    if (activo !== undefined) params.set('activo', activo ? '1' : '0');
+    if (empresaId !== undefined && empresaId !== '') params.set('empresa_id', String(empresaId));
+    const query = params.toString() ? `?${params.toString()}` : '';
     const response = await api.get<any>(`/departamentos${query}`);
     return extractArray<DepartamentoApi>(response.data, ['departamentos']);
   },

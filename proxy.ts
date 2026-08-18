@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // ─── Rutas públicas (no requieren autenticación) ──────────────────────────────
-const PUBLIC_PATHS = ['/login', '/no-autorizado'];
+const PUBLIC_PATHS = ['/login', '/registro', '/no-autorizado'];
 
 /**
  * Mapa de rutas protegidas por rol.

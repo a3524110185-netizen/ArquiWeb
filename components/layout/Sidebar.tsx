@@ -12,7 +12,7 @@ import {
   Building2, ClipboardList, ShieldAlert, FileCheck,
   ShoppingCart, BarChart3, Boxes, LogOut, ShieldCheck,
   UserCircle, Timer, Briefcase, CalendarCheck, Hammer, X,
-  Globe, Bell,
+  Globe, Bell, UserPlus,
 } from 'lucide-react';
 import type { AuthRole } from '@/types';
 import { SigoLogoBadge } from '@/components/ui/SigoLogo';
@@ -192,6 +192,7 @@ const superAdminNav: NavGroup[] = [
       { label: 'Dashboard Superadmin', href: '/dashboard-superadmin', icon: LayoutDashboard },
       { label: 'Empresas', href: '/superadmin/empresas', icon: Building2 },
       { label: 'Usuarios Globales', href: '/superadmin/usuarios', icon: Globe },
+      { label: 'Solicitudes', href: '/superadmin/solicitudes', icon: UserPlus },
     ],
   },
   {

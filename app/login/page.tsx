@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore, ROLE_REDIRECTS } from '@/store/useAuthStore';
-import { Mail, Lock, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { Mail, Lock, Eye, EyeOff, AlertCircle, Loader2, Clock, XCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import { SigoLogoMark } from '@/components/ui/SigoLogo';
 
@@ -16,6 +17,10 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const errorLower = error.toLowerCase();
+  const isPendiente = errorLower.includes('pendiente');
+  const isRechazado = errorLower.includes('rechaz');
 
   useEffect(() => {
     initAuth();
@@ -139,7 +144,25 @@ export default function LoginPage() {
             </div>
 
             {/* Error */}
-            {error && (
+            {error && isPendiente && (
+              <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm">
+                <Clock size={14} className="shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium">Cuenta pendiente de aprobación</p>
+                  <p className="text-amber-400/80 mt-0.5">{error}</p>
+                </div>
+              </div>
+            )}
+            {error && isRechazado && (
+              <div className="flex items-start gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                <XCircle size={14} className="shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium">Solicitud rechazada</p>
+                  <p className="text-red-400/80 mt-0.5">{error}</p>
+                </div>
+              </div>
+            )}
+            {error && !isPendiente && !isRechazado && (
               <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
                 <AlertCircle size={14} className="shrink-0" />
                 {error}
@@ -157,6 +180,13 @@ export default function LoginPage() {
               {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </button>
           </form>
+
+          <p className="text-center text-slate-400 text-sm mt-6">
+            ¿No tienes cuenta?{' '}
+            <Link href="/registro" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
+              Regístrate
+            </Link>
+          </p>
         </div>
 
         {/* Footer */}
