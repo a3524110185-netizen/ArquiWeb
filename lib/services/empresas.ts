@@ -27,6 +27,14 @@ function extractArray<T>(data: any, keys: string[] = []): T[] {
 }
 
 export const empresasService = {
+  // ENDPOINT PÚBLICO - Para registro (sin autenticación)
+  // GET /api/empresas-publicas
+  async getEmpresasPublicas(): Promise<EmpresaOption[]> {
+    const response = await api.get<any>('/empresas-publicas');
+    return extractArray<EmpresaOption>(response.data, ['empresas']);
+  },
+
+  // ENDPOINT AUTENTICADO - Para uso interno
   // GET /api/empresas
   async getEmpresas(): Promise<EmpresaOption[]> {
     const response = await api.get<any>('/empresas');

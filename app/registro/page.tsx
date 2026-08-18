@@ -34,7 +34,7 @@ export default function RegistroPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    empresasService.getEmpresas()
+    empresasService.getEmpresasPublicas()
       .then(setEmpresas)
       .catch(() => toast.error('Error', 'No se pudieron cargar las empresas'))
       .finally(() => setLoadingEmpresas(false));
